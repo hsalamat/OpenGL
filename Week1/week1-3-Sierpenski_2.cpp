@@ -3,6 +3,9 @@
 //
 // Sierpenski_2.cpp
 // Load the vertices in initialization step
+//Notice we moved glBufferData in the init() function when Pushing the coordinates of the vertices into the buffer
+//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+//why? becuase the coordinates are not changing!
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -65,14 +68,11 @@ void init(void)
 	}
 
 
-	//GLuint vao;
-	//glGenVertexArrays(1, &vao);
-	//glBindVertexArray(vao);
-
 	// Create and initialize a buffer object
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	//Notice that we are loading the coordinates here
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 

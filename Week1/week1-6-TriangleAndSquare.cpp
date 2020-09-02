@@ -1,7 +1,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 //
-// Add color
+// Using Vertex Array Objects
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -17,7 +17,7 @@ using namespace std;
 
 
 
-GLuint vao, vertices_vbo, colors_vbo;
+GLuint vao=0, vertices_vbo=0, colors_vbo=0;
 
 
 GLfloat vertices1[] = {
@@ -67,19 +67,16 @@ void init(void)
 	glLinkProgram(program);
 	glUseProgram(program);
 
-
-	vao = 0;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	vertices_vbo = 0;
 	glGenBuffers(1, &vertices_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), vertices1, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	colors_vbo = 0;
+
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), colors1, GL_STATIC_DRAW);
@@ -89,18 +86,15 @@ void init(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-	vao = 1;
-	glGenVertexArrays(2, &vao);
+	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	vertices_vbo = 0;
 	glGenBuffers(1, &vertices_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), vertices2, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	colors_vbo = 0;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), colors2, GL_STATIC_DRAW);

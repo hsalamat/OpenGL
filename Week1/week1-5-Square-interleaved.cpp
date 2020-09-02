@@ -3,6 +3,7 @@
 //
 // Square.cpp
 // Add color Interleaved using the same vbo
+////use one vertex buffer object for both vertex position and color
 ///////////////////////////////////////////////////////////////////////
 
 
