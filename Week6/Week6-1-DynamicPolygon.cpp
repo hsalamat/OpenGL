@@ -70,6 +70,7 @@ static int isWire = 0; // Is wireframe?
 
 void createModel(int n)
 {
+	theta = 0.0f;
 	for (int i = 0; i < n; ++i)
 	{
 
@@ -141,6 +142,7 @@ void init(void)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+	createModel(numVertices);
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -184,6 +186,7 @@ void display(void)
 	// Update the ortho projection.
 	projection = glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, -4.0f, 4.0f);
 
+	//Comment this out if you are not interested in changing colors randomly
 	createModel(numVertices);
 
 	glBindVertexArray(1);
@@ -193,7 +196,7 @@ void display(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
 
 	//transformObject(0.4f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
-	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(1.0f, X_AXIS, rotAngle = 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 
 	if (isWire)
@@ -230,11 +233,13 @@ void keyDown(unsigned char key, int x, int y)
 	case '+':
 		numVertices++;
 		// glutPostRedisplay marks the current window as needing to be redisplayed.
-		//glutPostRedisplay();
+		createModel(numVertices);
+		glutPostRedisplay();
 		break;
 	case '-':
 		numVertices--;
-		//glutPostRedisplay();
+		createModel(numVertices);
+		glutPostRedisplay();
 		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
@@ -271,7 +276,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Hello World");
+	glutCreateWindow("Dynamic Polygon");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();
