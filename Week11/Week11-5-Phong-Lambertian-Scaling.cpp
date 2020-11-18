@@ -1,8 +1,20 @@
-
+﻿
 ///////////////////////////////////////////////////////////////////////
 //Phong Shading + Lambertian Reflection Model
-//the Phong shading model and Lambertian reflection model  
-//No code change in the application. Magic happens in the shader!
+//In our previous example, the model - view matrix for normals was identical 
+//to our sphere modelview matrix.However, a separate normal matrix  is needed 
+//if there is non-uniform scaling. let’s change our code to scale our sphere by half along x-axis.
+//When we calculate lighting, we need the cosine of the angle between light direction l and 
+//the normal to the surface n, and the cosine of the angle between view direction v and n 
+//by calculating the dot products of l.n and v.n. When we transform to a different frame, 
+//we go from v to v’(Mv), where M is the modelview matrix. We must also transform n to n’ 
+//by a matrix like N such that these cosines are not changed. Otherwise our light calculation is wrong.
+//if v = [V1, V2, V3] and n = [N1, N2, N3], and T means transpose, then the dot product of v.n:
+//v.n = V1N1 + V2N2 + V3N3 = vTn
+//v.n = vTn = v′.n′ = (Mv)T(Nn) = vTMTNn
+//therefore, MTN = I
+//meaning our normal model view matrix N is equal to :
+//N = (MT)-1
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
 
@@ -251,12 +263,12 @@ void init(void)
 // transformModel
 //
 
-void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
+void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
 	glm::mat4 Model;
 	Model = glm::mat4(1.0f);
 	Model = glm::translate(Model, translation);
 	Model = glm::rotate(Model, glm::radians(rotationAngle), rotationAxis);
-	Model = glm::scale(Model, glm::vec3(scale));
+	Model = glm::scale(Model, scale);
 	mv =  view * Model;
 	glUniformMatrix4fv(modelViewID, 1, GL_FALSE, &mv[0][0]);
 
@@ -264,7 +276,12 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
+	//glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
+	
+	glm::mat4 normalMatrix;
+	normalMatrix = glm::inverse(Model);
+	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
+	
 }
 
 
@@ -282,7 +299,7 @@ void display(void)
 
 	// Update the ortho projection.
 	projection = glm::ortho(-1.0f + osH, 1.0f + osH, -1.0f + osV, 1.0f + osV, 0.0f, 100.0f);
-	transformObject(0.5f, X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(glm::vec3(0.25f, 0.5f, 0.5f), X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);

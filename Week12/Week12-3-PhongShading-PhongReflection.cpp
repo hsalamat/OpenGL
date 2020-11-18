@@ -1,11 +1,7 @@
-
 ///////////////////////////////////////////////////////////////////////
-//Phong Shading + Lambertian Reflection Model
-//the Phong shading model and Lambertian reflection model  
-//No code change in the application. Magic happens in the shader!
+//Phong Shading + Phong Reflection Model
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include "stdlib.h"
@@ -56,8 +52,14 @@ int  colorIndex = 0;
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
 glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f,1.0f);
+glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f,1.0f);
+glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+GLfloat materialShininess = 20.0;
 
 
 
@@ -177,15 +179,22 @@ void setupBuffers()
 	glEnableVertexAttribArray(2);
 }
 void  setupLights() {
+	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z,1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, 1.0f);
-}
+
+	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, 1.0f);
+	glUniform1f(glGetUniformLocation(program, "shininess"), materialShininess);
+
+	}
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere2.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere2.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"sphere4.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere4.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -195,6 +204,9 @@ void init(void)
 	modelViewID = glGetUniformLocation(program, "modelViewMatrix");
 	projectionID = glGetUniformLocation(program, "projectionMatrix");
 	normalID = glGetUniformLocation(program, "normalMatrix");
+
+	// frustum parameters: left, right, bottom, top, nearVal, farVal
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -264,7 +276,9 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
+	glm::mat4 normalMatrix;
+	normalMatrix = glm::inverse(Model);
+	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
 }
 
 
@@ -349,7 +363,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Phong Shading + Lambertian Reflection Model");
+	glutCreateWindow("Phong Shading + Phong Reflection Model");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

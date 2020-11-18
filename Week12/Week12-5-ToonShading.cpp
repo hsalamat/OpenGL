@@ -1,11 +1,15 @@
-
 ///////////////////////////////////////////////////////////////////////
-//Phong Shading + Lambertian Reflection Model
-//the Phong shading model and Lambertian reflection model  
-//No code change in the application. Magic happens in the shader!
+//Toon Shading
+//We could use only a few colors and emphasize the edges in objects to create nonphotorealistic effects.This effect create a cartoonlike effect in an image.suppose we only use three colors in the fragment shader.
+//vec4 color0 = materialDiffuse; // Material Color
+//vec4 color1 = vec4(0.0, 0.0, 0.0, 1.0);    // Silhouette Color
+//vec4 color2 = materialDiffuse; // Specular Color
+//We could then switch between colors based on the magnitude of the diffuse or specular colors.
+//if (specular < 0.2) finalColor *= 0.8;
+//else finalColor = color2;
+//if (diffuse < 0.5) finalColor *= 0.8;
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include "stdlib.h"
@@ -56,8 +60,14 @@ int  colorIndex = 0;
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
 glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f,1.0f);
+glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f,1.0f);
+glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+GLfloat materialShininess = 40.0;
 
 
 
@@ -177,15 +187,22 @@ void setupBuffers()
 	glEnableVertexAttribArray(2);
 }
 void  setupLights() {
+	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z,1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, 1.0f);
-}
+
+	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, 1.0f);
+	glUniform1f(glGetUniformLocation(program, "shininess"), materialShininess);
+
+	}
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere2.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere2.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"sphere6.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere6.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -264,7 +281,9 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
+	glm::mat4 normalMatrix;
+	normalMatrix = glm::inverse(Model);
+	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
 }
 
 
@@ -349,7 +368,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Phong Shading + Lambertian Reflection Model");
+	glutCreateWindow("Toon Shading");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

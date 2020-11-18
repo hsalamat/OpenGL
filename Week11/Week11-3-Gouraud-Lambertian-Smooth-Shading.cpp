@@ -194,9 +194,6 @@ void init(void)
 	projectionID = glGetUniformLocation(program, "projectionMatrix");
 	normalID = glGetUniformLocation(program, "normalMatrix");
 
-	// frustum parameters: left, right, bottom, top, nearVal, farVal
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0); // In world coordinates
-
 	// Camera matrix
 	view = glm::lookAt(
 		glm::vec3(0, 0, 1),	// Camera pos in World Space
@@ -265,9 +262,7 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glm::mat4 normalMatrix;
-	normalMatrix = glm::inverse(Model);
-	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
+	glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
 }
 
 

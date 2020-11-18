@@ -262,9 +262,7 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glm::mat4 normalMatrix;
-	normalMatrix = glm::inverse(Model);
-	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
+	glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
 }
 
 
