@@ -235,8 +235,7 @@ void init(void)
 		normals[i][3] = 0.0f;
 	}
 
-	setupBuffers();
-	setupLights();
+	setupBuffers();	
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -268,6 +267,9 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 
 void display(void)
 {
+
+	setupLights();
+
 	// Delta time stuff.
 	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
 	deltaTime = currentTime - lastTime;
@@ -319,12 +321,47 @@ void keyDown(unsigned char key, int x, int y)
 	case 'd':
 		osH -= scrollSpd;
 		break;
+	case 'r':
+		materialDiffuse = glm::vec4(1.0, 0.0, 0.0, 1.0);
+		break;
+	case 'g':
+		materialDiffuse = glm::vec4(0.0, 1.0, 0.0, 1.0);
+		break;
+	case 'b':
+		materialDiffuse = glm::vec4(0.0, 0.0, 1.0, 1.0);
+		break;
+	default:
+		break;
 	}
 }
 
 void keyUp(unsigned char key, int x, int y)
 {
 	// Empty for now.
+}
+
+void keyDownSpecial(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		lightPosition.y += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		lightPosition.y -= 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		lightPosition.x += 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		lightPosition.x -= 0.1;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		lightPosition.z += 0.1;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		lightPosition.z -= 0.1;
+	}
 }
 
 void mouseMove(int x, int y)
@@ -359,6 +396,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
+	glutSpecialFunc(keyDownSpecial);
 	glutPassiveMotionFunc(mouseMove); // or...
 	glutMainLoop();
 }

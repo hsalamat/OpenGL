@@ -53,7 +53,7 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightPosition = glm::vec4(1.0f, 1.0f, -1.0f,0.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f,1.0f);
 
@@ -236,7 +236,7 @@ void init(void)
 	}
 
 	setupBuffers();
-	setupLights();
+	
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -273,6 +273,7 @@ void display(void)
 	deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
 
+	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -319,6 +320,15 @@ void keyDown(unsigned char key, int x, int y)
 	case 'd':
 		osH -= scrollSpd;
 		break;
+	case 'r':
+		materialDiffuse = glm::vec4(1.0, 0.0, 0.0, 1.0);
+		break;
+	case 'g':
+		materialDiffuse = glm::vec4(0.0, 1.0, 0.0, 1.0);
+		break;
+	case 'b':
+		materialDiffuse = glm::vec4(0.0, 0.0, 1.0, 1.0);
+		break;
 	}
 }
 
@@ -336,6 +346,30 @@ void mouseDown(int btn, int state, int x, int y)
 {
 	cout << "Clicked: " << (btn == 0 ? "left " : "right ") << (state == 0 ? "down " : "up ") <<
 		"at " << x << "," << y << endl;
+}
+
+void keyDownSpecial(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		lightPosition.y += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		lightPosition.y -= 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		lightPosition.x += 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		lightPosition.x -= 0.1;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		lightPosition.z += 0.1;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		lightPosition.z -= 0.1;
+	}
 }
 
 //---------------------------------------------------------------------
@@ -359,6 +393,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
+	glutSpecialFunc(keyDownSpecial);
 	glutPassiveMotionFunc(mouseMove); // or...
 	glutMainLoop();
 }

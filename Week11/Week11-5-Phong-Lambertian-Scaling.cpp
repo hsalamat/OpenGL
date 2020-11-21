@@ -11,7 +11,7 @@
 //by a matrix like N such that these cosines are not changed. Otherwise our light calculation is wrong.
 //if v = [V1, V2, V3] and n = [N1, N2, N3], and T means transpose, then the dot product of v.n:
 //v.n = V1N1 + V2N2 + V3N3 = vTn
-//v.n = vTn = v′.n′ = (Mv)T(Nn) = vTMTNn
+//v.n = vTn = v′.n′ = (Mv)T(Nn) = vTMTNn => vTn = vTMTNn
 //therefore, MTN = I
 //meaning our normal model view matrix N is equal to :
 //N = (MT)-1
