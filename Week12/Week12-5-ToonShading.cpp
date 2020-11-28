@@ -1,13 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-//Toon Shading
-//We could use only a few colors and emphasize the edges in objects to create nonphotorealistic effects.This effect create a cartoonlike effect in an image.suppose we only use three colors in the fragment shader.
-//vec4 color0 = materialDiffuse; // Material Color
-//vec4 color1 = vec4(0.0, 0.0, 0.0, 1.0);    // Silhouette Color
-//vec4 color2 = materialDiffuse; // Specular Color
-//We could then switch between colors based on the magnitude of the diffuse or specular colors.
-//if (specular < 0.2) finalColor *= 0.8;
-//else finalColor = color2;
-//if (diffuse < 0.5) finalColor *= 0.8;
+//Toon shading
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
 
@@ -29,7 +21,7 @@ using namespace std;
 #define YZ_AXIS glm::vec3(0,1,1)
 #define XZ_AXIS glm::vec3(1,0,1)
 
-GLuint vao, ibo, points_vbo, colors_vbo, normals_vbo, modelViewID, projectionID, normalID;
+GLuint vao, ibo, points_vbo, colors_vbo, normals_vbo, modelViewID, projectionID, normalID, modelID, viewID;
 float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
 
@@ -38,7 +30,7 @@ float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mv, view, projection;
 
-const int Ndivisions = 5; 
+const int Ndivisions = 5;
 const int NumTetrahedrons = 1024; // 4^5 tetrahedrons      
 const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
@@ -59,15 +51,15 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
 glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f,1.0f);
+glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
 glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-GLfloat materialShininess = 40.0;
+GLfloat materialShininess = 20.0;
 
 
 
@@ -118,11 +110,11 @@ void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = a;
-	
+
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = b;
-	
+
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = c;
@@ -188,16 +180,16 @@ void setupBuffers()
 }
 void  setupLights() {
 	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z,1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
 	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, 1.0f);
 	glUniform1f(glGetUniformLocation(program, "shininess"), materialShininess);
 
-	}
+}
 
 void init(void)
 {
@@ -209,9 +201,14 @@ void init(void)
 	glLinkProgram(program);
 	glUseProgram(program);
 
-	modelViewID = glGetUniformLocation(program, "modelViewMatrix");
+	//modelViewID = glGetUniformLocation(program, "modelViewMatrix");
+	viewID = glGetUniformLocation(program, "viewMatrix");
+	modelID = glGetUniformLocation(program, "modelMatrix");
 	projectionID = glGetUniformLocation(program, "projectionMatrix");
 	normalID = glGetUniformLocation(program, "normalMatrix");
+
+	// frustum parameters: left, right, bottom, top, nearVal, farVal
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -255,7 +252,6 @@ void init(void)
 	}
 
 	setupBuffers();
-	setupLights();
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -274,21 +270,25 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	Model = glm::translate(Model, translation);
 	Model = glm::rotate(Model, glm::radians(rotationAngle), rotationAxis);
 	Model = glm::scale(Model, glm::vec3(scale));
-	mv =  view * Model;
-	glUniformMatrix4fv(modelViewID, 1, GL_FALSE, &mv[0][0]);
+	mv = view * Model;
+	glUniformMatrix4fv(modelID, 1, GL_FALSE, &Model[0][0]);
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 
 	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &projection[0][0]);
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glm::mat4 normalMatrix;
-	normalMatrix = glm::inverse(Model);
-	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
+	//glm::mat4 normalMatrix;
+	//normalMatrix = glm::inverse(Model);
+	//glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
 }
 
 
 void display(void)
 {
+
+	setupLights();
+
 	// Delta time stuff.
 	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
 	deltaTime = currentTime - lastTime;
@@ -343,6 +343,30 @@ void keyDown(unsigned char key, int x, int y)
 	}
 }
 
+void keyDownSpecial(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		lightPosition.y += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		lightPosition.y -= 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		lightPosition.x += 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		lightPosition.x -= 0.1;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		lightPosition.z += 0.1;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		lightPosition.z -= 0.1;
+	}
+}
+
 void keyUp(unsigned char key, int x, int y)
 {
 	// Empty for now.
@@ -380,6 +404,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
+	glutSpecialFunc(keyDownSpecial);
 	glutPassiveMotionFunc(mouseMove); // or...
 	glutMainLoop();
 }

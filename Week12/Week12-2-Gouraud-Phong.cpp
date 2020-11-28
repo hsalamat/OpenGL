@@ -21,7 +21,7 @@ using namespace std;
 #define YZ_AXIS glm::vec3(0,1,1)
 #define XZ_AXIS glm::vec3(1,0,1)
 
-GLuint vao, ibo, points_vbo, colors_vbo, normals_vbo, modelViewID, projectionID, normalID;
+GLuint vao, ibo, points_vbo, colors_vbo, normals_vbo, modelViewID, projectionID, normalID, modelID, viewID;
 float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
 
@@ -51,7 +51,7 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,1.0f);
 glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -182,7 +182,7 @@ void  setupLights() {
 	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z,1.0f);
 	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
 	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
 	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
@@ -201,7 +201,9 @@ void init(void)
 	glLinkProgram(program);
 	glUseProgram(program);
 
-	modelViewID = glGetUniformLocation(program, "modelViewMatrix");
+	//modelViewID = glGetUniformLocation(program, "modelViewMatrix");
+	viewID = glGetUniformLocation(program, "viewMatrix");
+	modelID = glGetUniformLocation(program, "modelMatrix");
 	projectionID = glGetUniformLocation(program, "projectionMatrix");
 	normalID = glGetUniformLocation(program, "normalMatrix");
 
@@ -250,7 +252,6 @@ void init(void)
 	}
 
 	setupBuffers();
-	setupLights();
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -269,21 +270,25 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 	Model = glm::translate(Model, translation);
 	Model = glm::rotate(Model, glm::radians(rotationAngle), rotationAxis);
 	Model = glm::scale(Model, glm::vec3(scale));
-	mv =  view * Model;
-	glUniformMatrix4fv(modelViewID, 1, GL_FALSE, &mv[0][0]);
+	mv = view * Model;
+	glUniformMatrix4fv(modelID, 1, GL_FALSE, &Model[0][0]);
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 
 	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &projection[0][0]);
 	// normal matrix is only really needed if there is nonuniform scaling
 	// it's here for generality but since there is
 	// no scaling in this example we could just use modelView matrix in shaders
-	glm::mat4 normalMatrix;
-	normalMatrix = glm::inverse(Model);
-	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
+	//glm::mat4 normalMatrix;
+	//normalMatrix = glm::inverse(Model);
+	//glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
 }
 
 
 void display(void)
 {
+
+	setupLights();
+
 	// Delta time stuff.
 	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
 	deltaTime = currentTime - lastTime;
@@ -338,6 +343,30 @@ void keyDown(unsigned char key, int x, int y)
 	}
 }
 
+void keyDownSpecial(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		lightPosition.y += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		lightPosition.y -= 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		lightPosition.x += 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		lightPosition.x -= 0.1;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		lightPosition.z += 0.1;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		lightPosition.z -= 0.1;
+	}
+}
+
 void keyUp(unsigned char key, int x, int y)
 {
 	// Empty for now.
@@ -375,6 +404,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
+	glutSpecialFunc(keyDownSpecial);
 	glutPassiveMotionFunc(mouseMove); // or...
 	glutMainLoop();
 }

@@ -23,7 +23,7 @@
 
  vec4 color1 = vec4(0.0, 0.0, 0.0, 1.0);    // Silhouette Color
 
- vec4 color2 = materialDiffuse; // Specular Color
+ vec4 color2 = materialSpecular; // Specular Color
 
  nE = normalize(E);
  nN = normalize(N);
@@ -46,6 +46,7 @@
     if (specular < 0.2) finalColor *= 0.8;
     else finalColor = color2;
 
+    if (specular > 0.2 && specular < 0.4) finalColor = materialDiffuse * 0.6;
 
     // Diffuse part
     float diffuse = max(dot(nN,-nL),0.0);

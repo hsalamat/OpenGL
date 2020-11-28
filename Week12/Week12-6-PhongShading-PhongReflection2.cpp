@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-//Phong Shading + Phong Blinn Reflection Model
+//Phong Shading + Phong Reflection Model
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
 
@@ -59,7 +59,7 @@ glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
 glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-GLfloat materialShininess = 40.0;
+GLfloat materialShininess = 20.0;
 
 
 
@@ -193,8 +193,8 @@ void  setupLights() {
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere5.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere5.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"sphere4-2.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere4-2.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -392,7 +392,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Phong Shading + Phong - Blinn Reflection Model");
+	glutCreateWindow("Phong Shading + Phong Reflection Model");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();
