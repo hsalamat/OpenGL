@@ -404,6 +404,27 @@ struct Cone : public Shape
 		shape_indices.push_back(sides);
 		shape_indices.push_back(sides + 1);
 		shape_indices.push_back(1);
+
+		for (int i = 0; i < shape_vertices.size(); i += 8)
+		{
+
+			/*shape_uvs = {
+			0.0f, 0.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f,
+			0.0f, 1.0f
+			};*/
+
+			shape_uvs.push_back(0.0f);
+			shape_uvs.push_back(0.0f);
+			shape_uvs.push_back(1.0f);
+			shape_uvs.push_back(0.0f);
+			shape_uvs.push_back(1.0f);
+			shape_uvs.push_back(1.0f);
+			shape_uvs.push_back(0.0f);
+			shape_uvs.push_back(1.0f);
+		}
+
 		ColorShape(1.0f, 1.0f, 1.0f);
 		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
 	}
