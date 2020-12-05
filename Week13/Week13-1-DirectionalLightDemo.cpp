@@ -286,8 +286,7 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 
 
 void display(void)
-{
-	setupLights();
+{	
 	// Delta time stuff.
 	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
 	deltaTime = currentTime - lastTime;
@@ -365,6 +364,9 @@ void keyDownSpecial(int key, int x, int y)
 	case GLUT_KEY_PAGE_DOWN:
 		dLight.direction.z -= 0.1;
 	}
+
+	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
+
 }
 
 void keyUp(unsigned char key, int x, int y)

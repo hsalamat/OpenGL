@@ -70,7 +70,7 @@ SpotLight sLight(glm::vec3(5.0f, 1.75f, -5.0f),	// Position.
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f,							// Diffuse strength.
 	glm::vec3(0.0f, -1.0f, 0.0f),  // Direction.
-	15.0f);
+	35.0f);
 
 void timer(int);
 

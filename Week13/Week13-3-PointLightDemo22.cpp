@@ -1,5 +1,8 @@
-///////////////////////////////////////////////////////////////////////
-//Directional Light
+﻿///////////////////////////////////////////////////////////////////////
+//Point Light using linear falloff 
+//The attenuation factor that scales the light value stays at full strength (1.0) until the distance d reaches falloffStart, it then linearly decays to 0.0 as the distance reaches falloffEnd
+//𝑨𝒕𝒕(𝒅) = 𝒔𝒂𝒕𝒖𝒓𝒂𝒕𝒆((𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅−𝒅)/(𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅 − 𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑺𝒕𝒂𝒓𝒕))
+//
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
 
@@ -50,24 +53,7 @@ GLfloat normals[NumVertices][4] = { 0 };
 int  Index = 0;
 int  colorIndex = 0;
 
-//glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-//glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 0.0f);
-//glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-//glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-//glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-//glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-//glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
-//glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-//GLfloat materialShininess = 40.0;
-
-// Light variables.
-//Ambient aLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
-
-//Specular sLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 40.0);
-
-//DirectionalLight dLight(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0), glm::vec4(1.0f, 0.8f, 0.0f, 1.0f));
 // Light variables.
 AmbientLight aLight(glm::vec3(1.0f, 1.0f, 1.0f),	// Ambient colour.
 	0.1f);							// Ambient strength.
@@ -76,8 +62,15 @@ DirectionalLight dLight(glm::vec3(0.0f, -1.0f, -1.0f), // Direction.
 	glm::vec3(1.0f, 1.0f, 0.0f),  // Diffuse colour.
 	0.8f);						  // Diffuse strength.
 
+PointLight pLight(
+	glm::vec3(0.0f, 0.0f, -1.0f),	// Position.
+	1.0f,				// range.	
+	glm::vec3(1.0f, 1.0f, 0.0f),  // Diffuse colour.
+	0.8f);						  // Diffuse strength.
 
 Material mat = { 1.0f, 32 }; // Alternate way to construct an object.
+
+
 
 static unsigned int
 program,
@@ -200,21 +193,20 @@ void  setupLights() {
 	glUniform1f(glGetUniformLocation(program, "aLight.ambientStrength"), aLight.ambientStrength);
 
 	// Setting directional light.
-	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColour"), dLight.diffuseColour.x, dLight.diffuseColour.y, dLight.diffuseColour.z);
-	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
-
-	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
+	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColour"), pLight.diffuseColour.x, pLight.diffuseColour.y, pLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.range"), pLight.range);
 
 	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), mat.specularStrength);
 	glUniform1f(glGetUniformLocation(program, "mat.shininess"), mat.shininess);
-
 
 }
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere7.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere7-2.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"sphere9.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere9-2.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -299,6 +291,7 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 
 void display(void)
 {
+	setupLights();
 	// Delta time stuff.
 	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
 	deltaTime = currentTime - lastTime;
@@ -359,25 +352,25 @@ void keyDownSpecial(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		dLight.direction.y += 0.1;
+		pLight.position.y += 0.1;
 		break;
 	case GLUT_KEY_DOWN:
-		dLight.direction.y -= 0.1;
+		pLight.position.y -= 0.1;
 		break;
 	case GLUT_KEY_LEFT:
-		dLight.direction.x += 0.1;
+		pLight.position.x -= 0.1;
 		break;
 	case GLUT_KEY_RIGHT:
-		dLight.direction.x -= 0.1;
+		pLight.position.x += 0.1;
 		break;
 	case GLUT_KEY_PAGE_UP:
-		dLight.direction.z += 0.1;
+		pLight.position.z += 0.1;
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		dLight.direction.z -= 0.1;
+		pLight.position.z -= 0.1;
 	}
-	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
 
+	cout << "Light Position: (" << pLight.position.x << "," << pLight.position.y << "," << pLight.position.z << ")" << endl;
 }
 
 void keyUp(unsigned char key, int x, int y)
@@ -405,7 +398,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Directional Light Demo");
+	glutCreateWindow("Point Light Demo 22");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

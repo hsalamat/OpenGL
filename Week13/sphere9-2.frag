@@ -1,41 +1,44 @@
 ﻿#version 430 core
 
-struct Diffuse
+
+struct Light
 {
-	vec4 light;
-	vec4 material;
+	vec3 diffuseColour;
+	float diffuseStrength;
 };
 
-struct Ambient
+struct AmbientLight
 {
-	vec4 light;
-	vec4 material;
-};
-
-struct Specular
-{
-	vec4 light;
-	vec4 material;
-	float shininess;
+	vec3 ambientColour;
+	float ambientStrength;
 };
 
 struct DirectionalLight 
 {
-	Diffuse base;
+	Light base;
 	vec3 direction;
 };
 
 struct PointLight
 {
-	Diffuse base;
+	Light base;
 	vec3 position;
-	float constant;
-	float linear;
-	float exponent;
+	//float constant;
+	//float linear;
+	//float exponent;
+	float range;
 };
 
-uniform Ambient aLight;
-uniform Specular sLight;
+
+struct Material
+{
+	float specularStrength;
+	float shininess;
+};
+
+
+uniform AmbientLight aLight;
+uniform Material mat;
 uniform DirectionalLight dLight;
 uniform PointLight pLight;
 
@@ -50,7 +53,6 @@ void main(void) {
 nE = normalize(E);
 nN = normalize(N);
 
-
 nL = normalize(pLight.position + E);
 
 vec3 H = normalize (-nL + nE);
@@ -62,7 +64,7 @@ float lambertTerm = dot(nN,-nL);
 float Kd = max (dot (nN, -nL) , 0.0);
 
 //Ambient Light
-vec4 Ia = aLight.light * aLight.material;
+vec4 Ia = vec4(aLight.ambientColour,1.0) * aLight.ambientStrength;
 
 //Diffuse Light
 vec4 Id = vec4(0.0,0.0,0.0,1.0);
@@ -73,12 +75,12 @@ vec4 Is = vec4(0.0,0.0,0.0,1.0);
 if(lambertTerm > 0.0) //only if lambertTerm is positive
 {
 
-Id =  pLight.base.light * pLight.base.material * lambertTerm;
+Id = vec4(pLight.base.diffuseColour * pLight.base.diffuseStrength * lambertTerm, 1.0);
 
+float specularTerm = pow(max(dot(H, nN), 0.0), mat.shininess );
 
-float specularTerm = pow(max(dot(H, nN), 0.0), sLight.shininess );
+Is = vec4(pLight.base.diffuseColour * mat.specularStrength * specularTerm, 1.0);
 
-Is = sLight.light * sLight.material * specularTerm; //add specular term
 }
 
 float distance = length(pLight.position + E);
@@ -90,6 +92,7 @@ float distance = length(pLight.position + E);
 //𝑨𝒕𝒕(𝒅) = 𝒔𝒂𝒕𝒖𝒓𝒂𝒕𝒆((𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅−𝒅)/(𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅 − 𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑺𝒕𝒂𝒓𝒕))
 float attenuation = (2.0 - distance)/(2.0 - 0.0);
 attenuation = clamp(attenuation, 0.0, 1.0);
+
 
 finalColor = (Ia + Id + Is) * attenuation ;
 finalColor.a = 1.0;
