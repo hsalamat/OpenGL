@@ -395,7 +395,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Point Light Demo 3");
+	glutCreateWindow("Point Light Demo 3-4");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

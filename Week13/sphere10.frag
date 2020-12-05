@@ -1,5 +1,5 @@
 ﻿#version 430 core
-
+//for demo 3-4
 struct Diffuse
 {
 	vec4 light;

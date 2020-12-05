@@ -13,7 +13,7 @@ struct Diffuse
 		material = dMaterial;
 	}
 };
-
+//old light
 struct Ambient
 {
 	glm::vec4 light;

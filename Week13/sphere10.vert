@@ -1,5 +1,5 @@
 #version 430 core
-
+//for demo3-4
 layout(location = 0) in vec3 vPositionAttr;
 layout(location = 1) in vec3 vColorAttr;
 layout(location = 2) in vec4 vNormalAttr;
