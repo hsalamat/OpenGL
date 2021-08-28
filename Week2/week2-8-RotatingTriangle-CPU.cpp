@@ -1,8 +1,17 @@
 
 ///////////////////////////////////////////////////////////////////////
 //
-// RotatingTriangle.cpp
-// This is a first example of rotation. yes it looks bad due to single buffering.
+// RotatingTriangle-DoubleBuffering.cpp
+//depending on the speed of your computer
+//and how much you increment the angle in the idle callback, you may see a display
+//that does not show a rotating triangle but rather a somewhat broken - up display with
+//pieces of the triangle showing.
+//Typically the frame buffer is redisplayed at a regular rate, known as
+//the refresh rate, which is in the range of 60 to 100 Hz(or frames per second).
+//The more common solution is double buffering.Instead of a single frame buffer,
+//the hardware has two frame buffers.One, called the front buffer, is one that is
+//displayed.The other, called the back buffer, is then available for constructing what
+//we would like to display.Once the drawing is complete, we swap the frontand back buffers
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -32,11 +41,11 @@ GLuint vao, points_vbo, colors_vbo;
 
 const GLfloat scale = 0.5f;
 
-int w=512, h=512;
+int w = 512, h = 512;
 int counter = 0;
 
 const float DegreesToRadians = 3.1415f / 180.0f;
-float angle = 0.010 * DegreesToRadians; // small angle in radians
+float angle = 0.150 * DegreesToRadians; // small angle in radians
 
 GLfloat points[] = {
 	0.0f, 0.5f, 0.0f,
@@ -86,9 +95,9 @@ void init(void)
 	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
 
-//glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 }
 
 
@@ -99,17 +108,15 @@ void init(void)
 
 void display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);	
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	//The display callback not only changes the vertex positions but must also send the new
-	//vertex data to the GPU as in the code for which the angle is 1 / 100 of a degree :
-
-	for (int i = 0; i < 3; i=i+3)
+	//here we are changing vertices position in CPU! Next example, we do the samething in the GPU!
+	for (int i = 0; i < 3; i = i + 3)
 	{
-		float x = cos(angle) * points[i] - sin(angle) * points[i+1];
-		float y = sin(angle) * points[i] + cos(angle) * points[i+1];
+		float x = cos(angle) * points[i] - sin(angle) * points[i + 1];
+		float y = sin(angle) * points[i] + cos(angle) * points[i + 1];
 		points[i] = x;
-		points[i+1] = y;
+		points[i + 1] = y;
 	}
 
 
@@ -124,21 +131,21 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT); // clear the window
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glFlush(); // Instead of double buffering.
-
-	glutPostRedisplay();
+	//glFlush(); // Instead of double buffering.
+	//rather than using glFlush at the end of the display callback, we use
+	glutSwapBuffers();
 }
 
 void idle()
 {
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
-		exit(0);
+		//exit(0);
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
@@ -175,6 +182,31 @@ void myKey(unsigned char key, int x, int y)
 	if (key == 'q' || key == 'Q') exit(0);
 }
 
+//Using menus involves taking a few simple steps.We must specify the actions
+//corresponding to each entry in the menu.We must link the menu to a particular
+//mouse button.Finally, we must register a callback function for each menu.We can
+//demonstrate simple menus with the example of a pop - up menu that has three entries.
+//The first selection allows us to exit our program.The second and third start and stop
+//the rotation.The function calls to set up the menu and to link it to the right mouse
+//button should be placed in our main function.
+
+void demo_menu(int id)
+{
+	switch (id)
+	{
+	case 1:
+		exit(0);
+		break;
+	case 2:
+		glutIdleFunc(idle);
+		break;
+	case 3:
+		glutIdleFunc(NULL);
+		break;
+	}
+	glutPostRedisplay();
+}
+
 //---------------------------------------------------------------------
 //
 // main
@@ -183,10 +215,18 @@ void myKey(unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	//Note that the default in GLUT is equivalent to using GLUT_SINGLE rather than GLUT_DOUBLE.
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(w, h);
 	glutInitWindowPosition(0, 0);
-	glutCreateWindow("Dynamic Triangle");
+	glutCreateWindow("Rotating Triangle");
+
+	glutCreateMenu(demo_menu);
+	glutAddMenuEntry("quit", 1);
+	glutAddMenuEntry("start rotation", 2);
+	glutAddMenuEntry("stop rotation", 3);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 
@@ -204,6 +244,9 @@ int main(int argc, char** argv)
 
 	glutIdleFunc(idle);
 
+
 	glutMainLoop();
+
+
 }
 

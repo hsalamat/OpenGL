@@ -23,8 +23,8 @@ using namespace std;
 
 GLuint Buffers[1];
 
-const int Ndivisions = 5;
-const int NumTetrahedrons = 1024;            // 4^5 tetrahedrons
+const int Ndivisions = 3; // 5;
+const int NumTetrahedrons = 64; //  1024;            // 4^5 tetrahedrons
 const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
 std::array<glm::vec2, NumVertices> vertices1;

@@ -29,15 +29,15 @@ GLuint Buffers[1];
 //const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 //const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
 
-const int Ndivisions = 2;
-const int NumTetrahedrons = 16;            // 4^1 tetrahedrons      
-const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
-const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
-
-//const int Ndivisions = 4;
-//const int NumTetrahedrons = 512;            // 4^4 tetrahedrons      
+//const int Ndivisions = 1;
+//const int NumTetrahedrons = 4;            // 4^1 tetrahedrons      
 //const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 //const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
+
+const int Ndivisions = 4;
+const int NumTetrahedrons = 512;            // 4^4 tetrahedrons      
+const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
+const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
 
 std::array<glm::vec3, NumVertices> vertices1;
 GLfloat vertices[NumVertices][3] = { 0 };
