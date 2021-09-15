@@ -45,19 +45,20 @@ using namespace std;
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include <string>
+#include <iostream>
 
+using namespace std; 
 
+GLint gScaleLocation;
 
 GLuint VBO[1];
 
 const GLuint NumVertices = 3;
 const GLfloat scale = 0.5f;
 GLfloat vertices[NumVertices][2] = {
-		{0.0, 0.0}, //bottom
-		{0.5,0.5}, //top right corner
-		{-0.5, 0.5}, //top left corner
-
-		
+		{0.0, 0.0},
+		{0.5,0.5},
+		{-0.5, 0.5},
 };
 
 
@@ -75,12 +76,44 @@ void init(void)
 
 	// Create shader program executable.
 
-	vertexShaderId = setShader((char*)"vertex", (char*)"cube.vert");
+	vertexShaderId = setShader((char*)"vertex", (char*)"vertexanim2.shader");
 	fragmentShaderId = setShader((char*)"fragment", (char*)"cube.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
+
 	glLinkProgram(program);
+
+	GLint Success;
+	glGetProgramiv(program, GL_LINK_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Failed to link program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
+	}
+
+
+	//you have to do this after linking the shader program
+	gScaleLocation = glGetUniformLocation(program, "gScale");
+	if (gScaleLocation == -1) {
+		cout << "Error getting uniform location of 'gScale'" << endl;
+		exit(1);
+	}
+
+
+	glValidateProgram(program);
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Invalid Shader program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
+	}
 	glUseProgram(program);
 
 	//Generating two buffers, one is used to store the coordinates of the vertices
@@ -96,6 +129,7 @@ void init(void)
 	glBindAttribLocation(program, 0, "vPosition");
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+	
 
 }
 
@@ -103,6 +137,19 @@ void init(void)
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+
+
+	static float Scale = 0.0f;
+	static float Delta = 0.005f;
+
+	Scale += Delta;
+	if ((Scale > 1.0f) || (Scale < -1.0f))
+	{
+		Delta *= -1.0f;
+	}
+
+	glUniform1f(gScaleLocation, Scale);
+
 
 	//what if you jusy wanted to see just edges and not a filled polygon, then uncomment this
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -131,7 +178,7 @@ void display(void)
 
 void idle()
 {
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 // Keyboard input processing routine.
@@ -160,7 +207,7 @@ int main(int argc, char** argv)
 	//the top-left corner of the display
 	glutInitWindowPosition(0, 0);
 
-	glutCreateWindow("Hello World");
+	glutCreateWindow("Hello Animation");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 

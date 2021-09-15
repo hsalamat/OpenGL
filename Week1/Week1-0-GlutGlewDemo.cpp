@@ -2,7 +2,7 @@
 // testGlut.cpp
 //
 // OpenGL program to draw a square.
-// 
+// This tutorial will rely on the fixed function pipeline instead of the programmable one.
 // Hooman
 ///////////////////////////////////
 
@@ -16,7 +16,15 @@ void drawScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor3f(0.0, 0.0, 0.0);
+	static GLclampf c = 0.0f;
+	glColor3f(c, c, c);
+	c += 1.0f / 256.0f;
+	if (c >= 1.0) {
+		c = 0.0f;
+	}
+	// The next iteration through glutMainLoop, the window's display callback will be called
+	//to redisplay the window's normal plane
+	glutPostRedisplay();
 
 	// Draw a polygon with specified vertices.
 	glBegin(GL_POLYGON);
@@ -99,7 +107,13 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyInput);
 
 	glewExperimental = GL_TRUE;
-	glewInit();
+
+	//Must be done after glut is initialized
+	GLenum res = glewInit();
+	if (res != GLEW_OK)
+	{
+		cout << "Error " << glewGetErrorString(res);
+	}
 
 	setup();
 

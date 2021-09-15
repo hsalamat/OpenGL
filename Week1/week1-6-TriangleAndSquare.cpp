@@ -122,10 +122,12 @@ display(void)
 	glBindVertexArray(1);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
+	//try 	glBindVertexArray(1); instead..what do you see? A triangle with first vertex array coordinates!
 	glBindVertexArray(2);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
 }
 
 
@@ -156,7 +158,7 @@ int main(int argc, char** argv)
 {
 	//Before we can open a window, theremust be interaction between the windowing systemand OpenGL.In GLUT, this interaction is initiated by the following function call :
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
 	//if you comment out this line, a window is created with a default size
 	glutInitWindowSize(512, 512);
@@ -164,7 +166,7 @@ int main(int argc, char** argv)
 	//the top-left corner of the display
 	glutInitWindowPosition(0, 0);
 
-	glutCreateWindow("Hello World");
+	glutCreateWindow("Hello Triangle");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 

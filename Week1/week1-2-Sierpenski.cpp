@@ -17,7 +17,7 @@ using namespace std;
 #include <array>
 
 
-GLuint Buffers[1];
+GLuint VBO[1];
 
 const GLuint NumVertices = 30000;
 const GLfloat scale = 0.5f;
@@ -45,8 +45,8 @@ void init(void)
 	glUseProgram(program);
 
 	//Next, we create a buffer object on the GPU and place our data in that object.
-	glGenBuffers(2, Buffers);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glGenBuffers(2, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBindAttribLocation(program, 0, "vPosition");
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 	glEnableVertexAttribArray(0);
@@ -100,7 +100,7 @@ display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Selecting the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 
 
 	//Pushing the coordinates of the vertices into the buffer

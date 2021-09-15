@@ -20,7 +20,7 @@
 
 #define BUFFER_OFFSET(x)  ((const void*) (x))
 
-GLuint Buffers[1];
+GLuint VBO[1];
 
 const GLuint NumVertices = 3;
 
@@ -56,8 +56,8 @@ void setup(void)
 
 	//Generating two buffers, one is used to store the coordinates of the vertices
 	//The other one is not used. Just wanted to show that we can allocate as many as buffers, some of which might left unused.
-	glGenBuffers(2, Buffers);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glGenBuffers(2, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBindAttribLocation(program, 0, "vPosition");
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 	glEnableVertexAttribArray(0);
@@ -88,7 +88,7 @@ void drawScene(void)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	//Selecting the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 
 
 	//Pushing the coordinates of the vertices into the buffer

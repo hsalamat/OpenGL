@@ -1,38 +1,28 @@
 
 ///////////////////////////////////////////////////////////////////////
 //
-// triangles.cpp
+// trianglewithcolor.cpp
+// This tutorial demonstrates a very important part of the 3D pipeline - the interpolation that 
+// the rasterizer performs on variables that come out of the vertex shader. 
+// As you have already seen, in order to get something meaningful on the screen you need to designate 
+// one of the VS output variables as 'gl_Position'. This is a 4-vector that contains 
+// the homogenuous coordinates of the vertex. The XYZ components of that vector are divided 
+// by the W component (a process known as perspective divide ) and any component which goes outside the normalized box ([-1,1]) gets clipped. 
+// The result is transformed to screen space coordinates and then the triangle (or any other supported primitive type) is rendered to screen by the rasterizer.
+//The rasterizer performs interpolation between the three triangle vertices(either going line by line or any other technique) 
+// and "visits" each pixel inside the triangle by executing the fragment shader.The fragment shader is 
+// expected to return a pixel color which the rasterizer places in the color buffer for display(after passing a few additional tests like depth test, etc).
+// Any other variable which comes out of the vertex shader does not go through the steps above.
+// If the fragment shader does not explicitly requests that variable(and you can mix and match multiple fragment shaders with the same vertex shader) 
+// then a common driver optimization will be to drop any instructions in the VS that only affect this variable
+// (for that particular shader program that combines this VSand FS pair).
+// However, if the FS does use that variable the rasterizer interpolates it during rasterizationand 
+// each FS invocation is provided a the interpolated value that matches that specific location.
+// This usually means that the values for pixels that are right next to each other will be a 
+// bit different(though as the triangle becomes further and further away from the camera 
+// that becomes less likely).
 //Hooman Salamat
-//In this tutorial we will see the usage of vertex buffer objects (VBOs) for the first time. 
-//As the name implies, they are used to store vertices. The objects that exist in the 3D world you are trying to visualize, be it monsters, castles or a simple revolving cube, are always built by connecting together a group of vertices. 
-//VBOs are the most efficient way to load vertices into the GPU. 
-//They are buffers that can be stored in video memory and provide the shortest access time to the GPU so they are definitely recommended.
-// Before reaching the rasterizer (that actually draws points, lines and triangles using screen coordinates) 
-//the visible vertices have their X, Y and Z coordinates in the range [-1.0,1.0]. 
-//The rasterizer maps these coordinates to screen space (e.g, if the screen width is 1024 then the X coodinate -1.0 is mapped to 0 and 1.0 is mapped to 1023). Finally, the rasterizer draws the primitives according to the topology which is specified in the draw call 
 
-////http://glew.sourceforge.net/
-//The OpenGL Extension Wrangler Library (GLEW) is a cross-platform open-source C/C++ extension loading library. 
-//GLEW provides efficient run-time mechanisms for determining which OpenGL extensions are supported on the target
-//platform. OpenGL core and extension functionality is exposed in a single header file. GLEW has been tested on a 
-//variety of operating systems, including Windows, Linux, Mac OS X, FreeBSD, Irix, and Solaris.
-//
-//http://freeglut.sourceforge.net/
-//The OpenGL Utility Toolkit(GLUT) is a library of utilities for OpenGL programs, which primarily perform system - level I / O with the host operating system.
-//Functions performed include window definition, window control, and monitoring of keyboardand mouse input.
-//Routines for drawing a number of geometric primitives(both in solid and wireframe mode) are also provided, including cubes, spheresand the Utah teapot.
-//GLUT also has some limited support for creating pop - up menus..
-
-//OpenGL functions are in a single library named GL (or OpenGL in Windows). Function names begin with the letters glSomeFunction*();
-//Shaders are written in the OpenGL Shading Language(GLSL)
-//To interface with the window system and to get input from external devices into our programs, we need another library. For the XWindow System, this library is called GLX, for Windows, it is wgl,
-//and for the Macintosh, it is agl. Rather than using a different library for each system,
-//we use two readily available libraries, the OpenGL Extension Wrangler(GLEW) and the OpenGLUtilityToolkit(GLUT).
-//GLEW removes operating system dependencies. GLUT provides the minimum functionality that should be expected in any modern window system.
-//OpenGL makes heavy use of defined constants to increase code readability and avoid the use of magic numbers.Thus, strings such as GL_FILL and GL_POINTS are defined in header(#include <GL/glut.h>)
-
-//https://glm.g-truc.net/0.9.9/index.html
-////OpenGL Mathematics (GLM) is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -53,11 +43,9 @@ GLuint VBO[1];
 const GLuint NumVertices = 3;
 const GLfloat scale = 0.5f;
 GLfloat vertices[NumVertices][2] = {
-		{0.0, 0.0}, //bottom
-		{0.5,0.5}, //top right corner
-		{-0.5, 0.5}, //top left corner
-
-		
+		{0.0, 0.0},
+		{0.5,0.5},
+		{-0.5, 0.5},
 };
 
 
@@ -75,8 +63,8 @@ void init(void)
 
 	// Create shader program executable.
 
-	vertexShaderId = setShader((char*)"vertex", (char*)"cube.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"cube.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"trianglewithcolor.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"trianglewithcolor.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -160,7 +148,7 @@ int main(int argc, char** argv)
 	//the top-left corner of the display
 	glutInitWindowPosition(0, 0);
 
-	glutCreateWindow("Hello World");
+	glutCreateWindow("Hello Color Triangle");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 

@@ -20,7 +20,7 @@ using namespace std;
 #include <array>
 
 
-GLuint Buffers[1];
+GLuint VBO[1];
 
 const GLuint NumVertices = 30000;
 const GLfloat scale = 0.5f;
