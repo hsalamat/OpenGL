@@ -45,12 +45,18 @@ int w = 512, h = 512;
 int counter = 0;
 
 const float DegreesToRadians = 3.1415f / 180.0f;
-float angle = 0.150 * DegreesToRadians; // small angle in radians
+float angle = 45.0f * DegreesToRadians; // small angle in radians
 
 GLfloat points[] = {
 	0.0f, 0.5f, 0.0f,
 	0.5f, -0.5f, 0.0f,
 	-0.5f, -0.5f, 0.0f
+};
+
+GLfloat newpoints[] = {
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f
 };
 
 GLfloat colors[] = {
@@ -111,18 +117,26 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//here we are changing vertices position in CPU! Next example, we do the samething in the GPU!
-	for (int i = 0; i < 3; i = i + 3)
+	//we have three vertices and every vertex has three dimension (x,y,z)
+	//In this example we are doing our transformation in the application (not a good idea!)
+	for (int i = 0; i < 9; i = i + 3)
 	{
-		float x = cos(angle) * points[i] - sin(angle) * points[i + 1];
-		float y = sin(angle) * points[i] + cos(angle) * points[i + 1];
-		points[i] = x;
-		points[i + 1] = y;
+
+		float x1 = points[i];
+		float y1 = points[i + 1];
+		float z1 = points[i + 2];
+		float x2 = x1 * cos(angle) - y1 * sin(angle);
+		float y2 = y1 * cos(angle) + x1 * sin(angle);
+		newpoints[i] = x2;
+		newpoints[i + 1] = y2;
+		newpoints[i + 2] = z1;
 	}
 
+	angle += 0.01;
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), newpoints, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);

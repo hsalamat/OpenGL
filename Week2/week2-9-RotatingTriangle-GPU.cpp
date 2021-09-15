@@ -1,7 +1,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 //
-// triangles.cpp
+// Rotating Triangles.cpp
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -95,12 +95,12 @@ void init(void)
 // transformModel
 //
 
-void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
+void transformObject(glm::vec3(scale), glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
 	glm::mat4 Model;
 	Model = glm::mat4(1.0f);
 	Model = glm::translate(Model, translation);
 	Model = glm::rotate(Model, glm::radians(rotationAngle), rotationAxis);
-	Model = glm::scale(Model, glm::vec3(scale));
+	Model = glm::scale(Model, scale);
 	glUniformMatrix4fv(modelID, 1, GL_FALSE, &Model[0][0]);
 }
 
@@ -113,12 +113,24 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	static float Scale = 0.0f;
+	static float Delta = 0.005f;
+
+	Scale += Delta;
+	if ((Scale > 1.0f) || (Scale < -1.0f))
+	{
+		Delta *= -1.0f;
+	}
+
 	glBindVertexArray(vao);
 	angle = angle + 0.1f;
-	transformObject(0.5f, Z_AXIS, angle, glm::vec3(0.0f, -0.3f, 0.0f));
+	transformObject(glm::vec3(1.0f,1.0f,1.0f), Z_AXIS, angle, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//Let's have fun!
+	//transformObject(glm::vec3(sinf(Scale), sinf(Scale), sinf(Scale)), Z_AXIS, angle, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	glDrawArrays(GL_LINE_LOOP, 0, 3); // GL_LINE_LOOP works too!
+	glDrawArrays(GL_TRIANGLES, 0, 3); // GL_LINE_LOOP works too!
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
