@@ -175,14 +175,16 @@ void drawScene(void)
 	glColor3f(1.0, 0.0, 0.0);
 
 	// Delta time stuff.
-	currentTime = glfwGetTime(); // Gets elapsed time in seconds.
+	currentTime = glfwGetTime(); // Gets delta time in seconds.
 	deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
+
+	deltaTime = 30.0f;
 
 	glBindVertexArray(vao);
 
 
-	translation = glm::vec3(translationX * deltaTime, translationY * deltaTime, translationZ * deltaTime);
+	translation = glm::vec3(translationX * deltaTime / (float)1000, translationY * deltaTime / (float)1000, translationZ * deltaTime / (float)1000);
 
 	scale = 0.2f;
 
@@ -257,39 +259,41 @@ int main(int argc, char** argv)
 
 	const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 	cout << "Your Joystick/Gamepad is called :" << name << endl;
-	
-	while (!glfwWindowShouldClose(window)) // Loop while window close alert is not set.
+
+	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+	cout << "Joystick/Gamepad 1 is connected" << present << endl;
+	int axesCount;
+	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+
+	cout << "Number of axes available: " << axesCount << endl;
+
+	const unsigned char* buttons = nullptr;
+
+	if (1 == present)
 	{
-		int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-		cout << "Joystick/Gamepad 1 is connected" << present << endl;
-		int axesCount;
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 
-		cout << "Number of axes available: " << axesCount << endl;
-
+		cout << "Left Analog Stick X Axis: " << axes[0] << endl;
+		cout << "Left Analog Stick Y Axis: " << axes[1] << endl;
+		cout << "Right Analog Stick X Axis: " << axes[2] << endl;
+		cout << "Right Analog Stick Y Axis: " << axes[3] << endl;
+		cout << "Left Trigger/L2: " << axes[4] << endl;
+		cout << "Right Trigger/R2: " << axes[5] << endl;
 		int buttonCount;
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+		buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 		cout << "Number of buttons available: " << buttonCount << endl;
 
-		if (1 == present)
-		{
-
-			cout << "Left Analog Stick X Axis: " << axes[0] << endl;
-			cout << "Left Analog Stick Y Axis: " << axes[1] << endl;
-			cout << "Right Analog Stick X Axis: " << axes[2] << endl;
-			cout << "Right Analog Stick Y Axis: " << axes[3] << endl;
-			cout << "Left Trigger/L2: " << axes[4] << endl;
-			cout << "Right Trigger/R2: " << axes[5] << endl;
-		
-
+	}
+	
+	while (!glfwWindowShouldClose(window)) // Loop while window close alert is not set.
+	{		
 			if (GLFW_PRESS == buttons[1])
 			{
 				cout << "B button pressed" << endl;
 			}
-			else if (GLFW_RELEASE == buttons[1])
-			{
-				cout << "B button released" << endl;
-			}
+			///else if (GLFW_RELEASE == buttons[1])
+			///{
+			///	cout << "B button released" << endl;
+			///}
 
 			GLFWgamepadstate state;
 
@@ -300,9 +304,23 @@ int main(int argc, char** argv)
 					cout << "button A is pressed " << endl;
 				}
 
-				cout << "speed " << state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] << endl;
+				if (glm::abs(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]) > 0.0001)
+				{
+					cout << "Left Analog Stick X Axis speed: " << state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] << endl;
+					translationX += state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				}
+					
+				if (glm::abs(state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]) > 0.0001)
+				{
+					cout << "Left Analog Stick Y Axis speed: " << state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] << endl;
+					translationY -= state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				}
+				
+				 
+			
+
+
 			}
-		}
 
 		glfwPollEvents(); // Process events in queue.
 		drawScene(); // Redraw scene.

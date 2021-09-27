@@ -90,7 +90,7 @@ std::array<glm::vec3, 8> unique_colors = {
 int Index = 0;
 
 void
-quad(int a, int b, int c, int d, int e, int f)
+quad(int a, int b, int c, int d, int e, int f, int color)
 {
 	//colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[a]; Index++;
 	//colors[Index] = unique_colors[b]; vertices[Index] = unique_vertices[b]; Index++;
@@ -101,24 +101,24 @@ quad(int a, int b, int c, int d, int e, int f)
 
 	//a color for each face
 
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[a]; Index++;
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[b]; Index++;
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[c]; Index++;
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[d]; Index++;
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[e]; Index++;
-	colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[f]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[a]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[b]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[c]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[d]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[e]; Index++;
+	colors[Index] = unique_colors[color]; vertices[Index] = unique_vertices[f]; Index++;
 
 }
 // generate 12 triangles: 36 vertices and 36 colors
 void
 colorcube()
 {
-	quad(2, 1, 0, 0, 3, 2);
-	quad(3, 0, 4, 4, 7, 3);
-	quad(0, 1, 5, 5, 4, 0);
-	quad(1, 2, 6, 6, 5, 1);
-	quad(5, 6, 7, 7, 4, 5);
-	quad(6, 2, 3, 3, 7, 6);
+	quad(2, 1, 0, 0, 3, 2, 1);
+	quad(3, 0, 4, 4, 7, 3, 2);
+	quad(0, 1, 5, 5, 4, 0, 3);
+	quad(1, 2, 6, 6, 5, 1, 4);
+	quad(5, 6, 7, 7, 4, 5, 5);
+	quad(6, 2, 3, 3, 7, 6, 6);
 
 	for (int i = 0; i < NumVertices; ++i) {
 
@@ -220,6 +220,7 @@ void display(void)
 
 		//Ordering the GPU to start the pipeline
 		glDrawArrays(GL_TRIANGLES, 0, 36); // Try GL_LINE_STRIP too!
+		//glDrawArrays(GL_LINE_STRIP, 0, 36);
 	}
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.

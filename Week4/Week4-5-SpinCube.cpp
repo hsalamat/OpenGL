@@ -38,7 +38,7 @@ fragmentShaderId;
 
 GLshort cube_indices[] = {
 	// Front.
-	3, 2, 1, 0, 
+	3, 2, 1, 0,
 	// Left.
 	0, 3, 7, 4,
 	// Bottom.
@@ -62,9 +62,9 @@ GLfloat cube_vertices[] = {
 	-0.9f, 0.9f, -0.9f,		// 7.
 };
 
-GLfloat colors[] = { 
-	1.0f, 0.0f, 0.0f,		
-	0.0f, 1.0f, 0.0f, 
+GLfloat colors[] = {
+	1.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f,
 	0.0f, 0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f,
 	1.0f, 0.0f, 1.0f,
@@ -89,27 +89,27 @@ void init(void)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-		glGenBuffers(1, &ibo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
-		points_vbo = 0;
-		glGenBuffers(1, &points_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glEnableVertexAttribArray(0);
+	points_vbo = 0;
+	glGenBuffers(1, &points_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
 
-		colors_vbo = 0;
-		glGenBuffers(1, &colors_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
-		
-	//glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
-	
+	colors_vbo = 0;
+	glGenBuffers(1, &colors_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
+	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
 }
@@ -141,14 +141,14 @@ void display(void)
 	lastTime = currentTime;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	glBindVertexArray(vao);
 
-	transformObject(0.4f, axis, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.4f, axis, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
-	
+
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 	glutSwapBuffers(); // Instead of double buffering.
@@ -161,12 +161,12 @@ void idle()
 
 void mouseDown(int btn, int state, int x, int y)
 {
-	cout << "Clicked: " << (btn == 0 ? "left " : "right ") << (state == 0 ? "down " : "up ") <<
+	cout << "Clicked: " << (btn == 0 ? "left " : "middle/right ") << (state == 0 ? "down " : "up ") <<
 		"at " << x << "," << y << endl;
 
-	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) axis = glm::vec3(1,0,0);
-	if (btn == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN) axis = glm::vec3(0,1,0);
-	if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) axis = glm::vec3(0,0,1);
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) axis = glm::vec3(1, 0, 0);
+	if (btn == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN) axis = glm::vec3(0, 1, 0);
+	if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) axis = glm::vec3(0, 0, 1);
 }
 
 //---------------------------------------------------------------------
