@@ -220,7 +220,7 @@ void display(void)
 	projection = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
 
 	//transformObject(0.2f, X_AXIS, rotAngle = 0.0 , glm::vec3(0.0f, 0.0f, 0.0f));
-	transformObject(0.2f, YZ_AXIS, rotAngle=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.2f, YZ_AXIS, rotAngle +=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 
 	//Ordering the GPU to start the pipeline
@@ -242,8 +242,8 @@ keyboard(unsigned char key, int x, int y)
 
 	case 'z': zNear *= 1.1; zFar *= 1.1; break;
 	case 'Z': zNear *= 0.9; zFar *= 0.9; break;
-	case 'r': radius *= 2.0; break;
-	case 'R': radius *= 0.5; break;
+	case 'r': radius *= 1.1; break;
+	case 'R': radius *= 0.9; break;
 	case 'o': theta += dr; break;
 	case 'O': theta -= dr; break;
 	case 'p': phi += dr; break;
@@ -284,7 +284,8 @@ int
 main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+	glutSetOption(GLUT_MULTISAMPLE, 4);
 	glutInitWindowSize(512, 512);
 	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);

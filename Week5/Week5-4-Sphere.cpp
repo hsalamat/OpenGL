@@ -94,9 +94,12 @@ void divide_triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, int k)
 	if (k > 0)
 	{
 		// compute midpoints of sides
-		glm::vec3 ab = glm::normalize((a + b) / 2.0f);
+	glm::vec3 ab = glm::normalize((a + b) / 2.0f);
 		glm::vec3 ac = glm::normalize((a + c) / 2.0f);
 		glm::vec3 bc = glm::normalize((b + c) / 2.0f);
+		//glm::vec3 ab = (a + b) / 2.0f;
+		//glm::vec3 ac = (a + c) / 2.0f;
+		//glm::vec3 bc = (b + c) / 2.0f;
 		// subdivide all but inner triangle
 		divide_triangle(a, ab, ac, k - 1);
 		divide_triangle(ab, b, bc, k - 1);
@@ -248,8 +251,8 @@ void display(void)
 	transformObject(0.5f, X_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	//glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-	glDrawArrays(GL_LINES, 0, NumVertices);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//glDrawArrays(GL_LINES, 0, NumVertices);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -272,6 +275,14 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case 'W':
+		glPolygonMode(GL_FRONT, GL_LINE);
+		glPolygonMode(GL_BACK, GL_LINE);
+		break;
+	case 'S':
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_BACK, GL_FILL);
+		break;
 	case 'w':
 		osV -= scrollSpd;
 		break;

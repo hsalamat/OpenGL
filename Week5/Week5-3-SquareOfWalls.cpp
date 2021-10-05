@@ -148,7 +148,7 @@ void display(void)
 	//lastTime = currentTime;
 
 	//glPolygonMode(GL_FRONT, GL_LINE);
-	//glPolygonMode(GL_BACK, GL_FILL);
+    //glPolygonMode(GL_BACK, GL_LINE);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -184,6 +184,14 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case 'W':
+		glPolygonMode(GL_FRONT, GL_LINE);
+		glPolygonMode(GL_BACK, GL_LINE);
+		break;
+	case 'S':
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_BACK, GL_FILL);
+		break;
 	case 'w':
 		osV -= scrollSpd;
 		break;

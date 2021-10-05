@@ -29,7 +29,7 @@ float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
 
 // Horizontal and vertical ortho offsets.
-float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
+float osH = 0.0f, osV = 0.0f, osZ= 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mvp, view, projection;
 
@@ -160,7 +160,7 @@ void display(void)
 	//projection = glm::ortho(-5.0f , 5.0f, -5.0f, 5.0f, -2.0f, 2.0f);
 
 
-	projection = glm::ortho(-10.0f + osH, 10.0f + osH, -10.0f + osV, 10.0f + osV, -100.0f, 100.0f);
+	projection = glm::ortho(-10.0f + osH, 10.0f + osH, -10.0f + osV, 10.0f + osV, osZ + -1.0f, osZ + 1.0f);
 	//projection = glm::ortho(0.0f + osH, 10.0f + osH, 0.0f + osV, 10.0f + osV, 0.0f, 100.0f);
 
 	//transformObject(1.0f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -201,6 +201,11 @@ void keyDown(unsigned char key, int x, int y)
 		break;
 	case 'd':
 		osH -= scrollSpd;
+	case 'q':
+		osZ += scrollSpd;
+		break;
+	case 'e':
+		osZ -= scrollSpd;
 		break;
 	}
 }
