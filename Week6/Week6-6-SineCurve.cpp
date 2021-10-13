@@ -3,16 +3,13 @@
 /////////////////////////////////////////////////////////////////////         
 // DynamicPolygon.cpp
 //
-// This program draws a line loop/TRIANLGE FAN with vertices equally apart on 
-// a fixed circle. The larger the number of vertices the better
-// the loop approximates the circle.
-//
-// Interaction: 
-// Press the space bar to toggle between wirefrime and polygon.
-// Press +/- to increase/decrease the number of vertices of the loop. 
+//Draw a sine curve between x = -10pi and x = 10pi
+//Follow the strategy of DynamicPolygon.cpp to draw a polyline through a
+//sample from the sine curve.
+// 
 // Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
-
+///////////////////////////////////////////////////////////////////////
 
 
 #include <iostream>
@@ -66,18 +63,33 @@ GLfloat shape_vertices[MaxNumVertices][3] = { 0 };
 GLfloat shape_colors[MaxNumVertices][3] = { 0 };
 
 // Globals.
-static int isWire = 0; // Is wireframe?
+static int isWire = 1; // Is wireframe?
+
+// Font selection: A fixed width font with every character fitting in an 8 by 13 pixel rectangle.
+static long font = (long)GLUT_BITMAP_8_BY_13;
+
+// Routine to draw a bitmap character string.
+void writeBitmapString(void* font, char* string)
+{
+	char* c;
+	//glutBitmapCharacter renders a bitmap character using OpenGL.
+	for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
+}
+
+
 
 void createModel(int n)
 {
-	theta = 0.0f;
-	for (int i = 0; i < n; ++i)
+	float R = 20.0; // Radius of helix.
+	float t; // Angle parameter.
+
+	int i = 0;
+	for (t = -10* PI; t <= 10 * PI; t += PI / 20.0)
 	{
-
-		vertices[i] = glm::vec3(X + R * cos(theta), Y + R * sin(theta), 0.0);
+		vertices[i] = glm::vec3(t, sin(t), 0);
 		colors[i] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
-
-		theta += 2 * PI / n;
+		numVertices = i;
+		i++;
 	}
 
 	for (int i = 0; i < n; ++i) {
@@ -107,6 +119,7 @@ void init(void)
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
 
+	//projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -141,7 +154,6 @@ void init(void)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	createModel(numVertices);
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -183,9 +195,9 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Update the ortho projection.
-	projection = glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, -4.0f, 4.0f);
+	//projection = glm::ortho(-40.0f, 40.0f, -10.0f, 10.0f, -4.0f, 4.0f);
+	projection = glm::ortho(-40.0f, 40.0f, -5.0f, 5.0f, -6.0f, 4.0f);
 
-	//Comment this out if you are not interested in changing colors randomly
 	createModel(numVertices);
 
 	glBindVertexArray(1);
@@ -195,18 +207,15 @@ void display(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
 
 	//transformObject(0.4f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
-	transformObject(1.0f, X_AXIS, rotAngle = 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 
-	if (isWire)
-	{
-		glDrawArrays(GL_LINE_LOOP, 0, numVertices);
-	}
-	else
-	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
-	}
+	glDrawArrays(GL_LINE_STRIP, 0, numVertices);
 
+	// Write labels.
+	//glColor3f(1.0, 0.0, 0.0);
+	glRasterPos3f(15.0, 15.0, 0.0);
+	writeBitmapString((void*)font, (char*)"Sine Curve");
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -232,13 +241,11 @@ void keyDown(unsigned char key, int x, int y)
 	case '+':
 		numVertices++;
 		// glutPostRedisplay marks the current window as needing to be redisplayed.
-		createModel(numVertices);
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	case '-':
 		numVertices--;
-		createModel(numVertices);
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
@@ -275,7 +282,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Dynamic Polygon");
+	glutCreateWindow("Sine Curve");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

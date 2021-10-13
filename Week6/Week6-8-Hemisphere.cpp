@@ -1,24 +1,16 @@
-
-///////////////////////////////////////////////////////         
-// helix.cpp
+/////////////////////////////////////////////////////////////////////         
+// Ellipse.cpp
 //
-// This program approximates a helix with a line strip.
-//Helix is an object having a three-dimensional shape like that of a wire wound uniformly in a single layer around a cylinder or cone, as in a corkscrew or spiral staircase.
-//The helix climbs up the z axis simultaneously as it rotates circularly with increasing t (it coils around the z-axis)
-//
-//Parametric Equation:
-// x = R * cos(t), y = R * sin(t) and z = t - 60.0  -10PI <= t <= 10PI
-//you can simply have  z = t, however we tack on z = t - 60 to push the helix far enough down the z axis
-//one full turn is around 2PI --> we wanted to have 10 rounds!
-//When you run, you only see a circle, becuase of orthographic project onto the vewing face flattens the helix
-//To fix this, we need to turn the helix upright, so it coils around the y-axis.
-//x = R * cos(t), z = R * sin(t) and y = t - 60.0 
-//orthographics projection squashes a dimension so it's not suitable for 3D scene.
-//for perspective dimension we use glFrustum(left, right, bottom, top, near, far)
-//frustum is a truncated pyramid whose top has been cut off by a plane parallel to its  base
-//Update the ortho projection!!!
+//Draw an ellipse.
+//Recall the parametric equations for an ellipse on the xy - plane, centered at(X; Y), 
+//with semi - major axis of length A and semi - minor axis of length B :
+//	x = X + Acos t; y = Y + B sin t; z = 0; 0 <= t <= 2pi
+// 
+// Interaction: 
+// Press the space bar to toggle between wirefrime and polygon.
+// Press +/- to increase/decrease the number of vertices of the loop.
 // Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////// 
 
 
 #include <iostream>
@@ -55,11 +47,10 @@ vertexShaderId,
 fragmentShaderId;
 
 // Globals.
-static float R = 2.0; // Radius of circle.
 static float X = 0.0; // X-coordinate of center of circle.
 static float Y = 0.0; // Y-coordinate of center of circle.
 const int MaxNumVertices = 500; // Number of vertices on circle.
-static int numVertices = 3;
+static int numVertices = 0;
 #define PI 3.14159265358979324
 
 float theta = 0.0f;
@@ -74,20 +65,58 @@ GLfloat shape_colors[MaxNumVertices][3] = { 0 };
 // Globals.
 static int isWire = 1; // Is wireframe?
 
-void createModel()
-{
-	float R = 20.0; // Radius of helix.
-	float t; // Angle parameter.
+// Font selection: A fixed width font with every character fitting in an 8 by 13 pixel rectangle.
+static long font = (long)GLUT_BITMAP_8_BY_13;
 
-	int i = 0;
-	for ( t = -10 * PI; t <= 10 * PI; t += PI / 20.0)
+std::array<glm::vec3, 8> unique_colors = {
+	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f),
+	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(1.0f, 1.0f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 1.0f),
+	glm::vec3(0.0f, 1.0f, 1.0f),
+	glm::vec3(0.5f, 0.0f, 0.0f),
+	glm::vec3(1.0f, 1.0f, 1.0f)   //white
+};
+
+// Routine to draw a bitmap character string.
+void writeBitmapString(void* font, char* string)
+{
+	char* c;
+	//glutBitmapCharacter renders a bitmap character using OpenGL.
+	for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
+}
+
+// Globals.
+static float R = 5.0; // Radius of hemisphere.
+static int p = 10; // Number of longitudinal slices.
+static int q = 10; // Number of latitudinal slices.
+static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate hemisphere.
+
+void createModel(int n)
+{
+	// Array of latitudinal triangle strips, each parallel to the equator, stacked one
+	// above the other from the equator to the north pole.
+	for (int j = 0; j < q; j++)
 	{
-		//vertices[i] = glm::vec3(R * cos(t), R * sin(t), t - 60.0);
-		vertices[i] = glm::vec3(R * cos(t), t, R * sin(t) - 60.0);
-		colors[i] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
-		numVertices = i;
-		i++;
+		// One latitudinal triangle strip.
+		for (int i = 0; i <= p; i++)
+		{
+			vertices[numVertices] = glm::vec3(R * cos((float)(j + 1) / q * PI / 2.0) * cos(2.0 * (float)i / p * PI),
+				R * sin((float)(j + 1) / q * PI / 2.0),
+				-R * cos((float)(j + 1) / q * PI / 2.0) * sin(2.0 * (float)i / p * PI));
+			colors[numVertices] = unique_colors[0];
+			numVertices++;
+
+			vertices[numVertices] = glm::vec3(R * cos((float)j / q * PI / 2.0) * cos(2.0 * (float)i / p * PI),
+				R * sin((float)j / q * PI / 2.0),
+				-R * cos((float)j / q * PI / 2.0) * sin(2.0 * (float)i / p * PI));
+			colors[numVertices] = unique_colors[0];
+
+			numVertices++;
+		}
 	}
+
 
 	for (int i = 0; i < numVertices; ++i) {
 
@@ -115,6 +144,10 @@ void init(void)
 
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
+
+	createModel(numVertices);
+
+	//projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -190,17 +223,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Update the ortho projection.
-	projection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.0f, 100.0f); // In world coordinates
-	//step2
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0);
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 550.0); //move the back face back
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 10.0, 100.0); //move the front face back
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 2.5, 100.0); //move the front face forward
-	//projection = glm::frustum(-5.0, 5.0, -10.0, 10.0, 5.0, 100.0); //"make" the front face bigger
-	//projection = glm::frustum(-10.0, 10.0, -5.0, 5.0, 5.0, 100.0); //"make" the front face taller
-
-
-	createModel();
+	projection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, -4.0f, 4.0f);
 
 	glBindVertexArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
@@ -214,13 +237,17 @@ void display(void)
 
 	if (isWire)
 	{
-		glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+		glDrawArrays(GL_LINE_LOOP, 0, numVertices);
 	}
 	else
 	{
 		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
 	}
 
+	// Write labels.
+	//glColor3f(1.0, 0.0, 0.0);
+	glRasterPos3f(15.0, 15.0, 0.0);
+	writeBitmapString((void*)font, (char*)"Hemisphere");
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -243,6 +270,15 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case '+':
+		numVertices++;
+		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		//glutPostRedisplay();
+		break;
+	case '-':
+		numVertices--;
+		//glutPostRedisplay();
+		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
 		else isWire = 0;
@@ -278,7 +314,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Helix");
+	glutCreateWindow("Ellipse");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

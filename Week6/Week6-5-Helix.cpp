@@ -1,14 +1,23 @@
 
-///////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////         
-// DynamicPolygon.cpp
+///////////////////////////////////////////////////////         
+// helix.cpp
 //
-//Draw a sine curve between x = -10pi and x = 10pi
-//Follow the strategy of DynamicPolygon.cpp to draw a polyline through a
-//sample from the sine curve.
-// 
+// This program approximates a helix with a line strip.
+//Helix is an object having a three-dimensional shape like that of a wire wound uniformly in a single layer around a cylinder or cone, as in a corkscrew or spiral staircase.
+//The helix climbs up the z axis simultaneously as it rotates circularly with increasing t (it coils around the z-axis)
+//
+//Parametric Equation:
+// x = R * cos(t), y = R * sin(t) and z = t - 60.0  -10PI <= t <= 10PI
+//you can simply have  z = t, however we tack on z = t - 60 to push the helix far enough down the z axis
+//one full turn is around 2PI --> we wanted to have 10 rounds!
+//When you run, you only see a circle, becuase of orthographic project onto the vewing face flattens the helix
+//To fix this, we need to turn the helix upright, so it coils around the y-axis.
+//x = R * cos(t), z = R * sin(t) and y = t - 60.0 
+//orthographics projection squashes a dimension so it's not suitable for 3D scene.
+//for perspective dimension we use glFrustum(left, right, bottom, top, near, far)
+//frustum is a truncated pyramid whose top has been cut off by a plane parallel to its  base
+//Update the ortho projection!!!
 // Hooman Salamat
-///////////////////////////////////////////////////////////////////// 
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -76,23 +85,22 @@ void writeBitmapString(void* font, char* string)
 	for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
 }
 
-
-
-void createModel(int n)
+void createModel()
 {
 	float R = 20.0; // Radius of helix.
 	float t; // Angle parameter.
 
 	int i = 0;
-	for (t = -10* PI; t <= 10 * PI; t += PI / 20.0)
+	for ( t = -10 * PI; t <=  10 * PI; t += PI / 20.0)
 	{
-		vertices[i] = glm::vec3(t, sin(t), 0);
+		vertices[i] = glm::vec3(R * cos(t), R * sin(t), t - 60.0);
+		//vertices[i] = glm::vec3(R * cos(t), t, R * sin(t) - 60.0);
 		colors[i] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
 		numVertices = i;
 		i++;
 	}
 
-	for (int i = 0; i < n; ++i) {
+	for (int i = 0; i < numVertices; ++i) {
 
 		shape_vertices[i][0] = vertices[i][0];
 		shape_vertices[i][1] = vertices[i][1];
@@ -118,8 +126,6 @@ void init(void)
 
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
-
-	//projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -195,9 +201,17 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Update the ortho projection.
-	projection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, -4.0f, 4.0f);
+	projection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.0f, 100.0f); // In world coordinates
+	//step2
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0);
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 550.0); //move the back face back
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 10.0, 100.0); //move the front face back
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 2.5, 100.0); //move the front face forward
+	//projection = glm::frustum(-5.0, 5.0, -10.0, 10.0, 5.0, 100.0); //"make" the front face bigger
+	//projection = glm::frustum(-10.0, 10.0, -5.0, 5.0, 5.0, 100.0); //"make" the front face taller
 
-	createModel(numVertices);
+
+	createModel();
 
 	glBindVertexArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
@@ -209,12 +223,19 @@ void display(void)
 	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 
-	glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+	if (isWire)
+	{
+		glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+	}
 
-	// Write labels.
-	//glColor3f(1.0, 0.0, 0.0);
-	glRasterPos3f(15.0, 15.0, 0.0);
-	writeBitmapString((void*)font, (char*)"Sine Curve");
+	glColor3f(0.0, 0.0, 0.0);
+	//glRasterPos3f(10.0, 10.0, 0.0);
+	glRasterPos3f(-0.0, -15.0, -15.0);
+	writeBitmapString((void*)font, (char*)"Helix!");
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -237,15 +258,6 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
-	case '+':
-		numVertices++;
-		// glutPostRedisplay marks the current window as needing to be redisplayed.
-		//glutPostRedisplay();
-		break;
-	case '-':
-		numVertices--;
-		//glutPostRedisplay();
-		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
 		else isWire = 0;
@@ -281,7 +293,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Sine Curve");
+	glutCreateWindow("Helix");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

@@ -152,12 +152,11 @@ void drawAnnulus(float R, float X, float Y, float Z, int colorIndex)
 	int i;
 	for (i = 0; i < numVertices*2; i=i+2)
 	{
-	
 		vertices[i] = glm::vec3(X + R * cos(t), Y + R * sin(t), Z);
 		//colors[i] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
 		colors[i] = unique_colors[colorIndex];
 
-		vertices[i+1] = glm::vec3(X + (R+10) * cos(t), Y + (R+10) * sin(t), Z);
+		vertices[i + 1] = glm::vec3(X + (R + 10) * cos(t), Y + (R + 10) * sin(t), Z);
 		//colors[i+1] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
 		colors[i+1] = unique_colors[colorIndex];
 
@@ -180,7 +179,7 @@ void drawAnnulus(float R, float X, float Y, float Z, int colorIndex)
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
 	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, numVertices * 2);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, numVertices * 2);  //numVertices * 2
 }
 
 
@@ -253,7 +252,13 @@ void display(void)
 	//deltaTime = currentTime - lastTime;
 	//lastTime = currentTime;
 
-	if (isWire) glPolygonMode(GL_FRONT, GL_LINE); else glPolygonMode(GL_FRONT, GL_FILL);
+	if (isWire) {
+		glPolygonMode(GL_FRONT, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT, GL_FILL);
+	}
 
 	//theta += 0.1;
 	//if (theta > 2.0f * 3.1415f) theta -= 2.0f * 3.1415f;
@@ -278,13 +283,14 @@ void display(void)
 	drawDisc(10.0, 75.0, 75.0, 0.5, 7);
 	glDisable(GL_DEPTH_TEST);
 
-	//
-	////Lower: A true circular annulus with a real hole :
+	//////
+	////////Lower: A true circular annulus with a real hole :
 	drawAnnulus(10.0, 50.0, 25.0, 0.0, 6);
 
 
-	//// Write labels.
-	//glColor3f(0.0, 0.0, 0.0);
+	//////// Write labels.
+	//////glColor3f(0.0, 0.0, 0.0);
+	
 	glRasterPos3f(15.0, 51.0, 0.0);
 	writeBitmapString((void*)font, (char*)"Overwritten");
 	glRasterPos3f(69.0, 51.0, 0.0);

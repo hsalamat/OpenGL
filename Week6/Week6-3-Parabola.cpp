@@ -1,16 +1,16 @@
+
+///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// Ellipse.cpp
+// @file parabola.cpp
+// @brief create Parabola
+// This program draws a line strip with vertices on a parabola.
+// Increasing the number of vertices makes the strip approximate the parabola.
 //
-//Draw an ellipse.
-//Recall the parametric equations for an ellipse on the xy - plane, centered at(X; Y), 
-//with semi - major axis of length A and semi - minor axis of length B :
-//	x = X + Acos t; y = Y + B sin t; z = 0; 0 <= t <= 2pi
-// 
-// Interaction: 
-// Press the space bar to toggle between wirefrime and polygon.
-// Press +/- to increase/decrease the number of vertices of the loop.
-// Hooman Salamat
+// Interaction:
+// @note: Press +/- to increase/decrease the number of vertices of the strip.
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
+
 
 
 #include <iostream>
@@ -47,13 +47,8 @@ vertexShaderId,
 fragmentShaderId;
 
 // Globals.
-static float X = 0.0; // X-coordinate of center of circle.
-static float Y = 0.0; // Y-coordinate of center of circle.
 const int MaxNumVertices = 500; // Number of vertices on circle.
-static int numVertices = 0;
-#define PI 3.14159265358979324
-
-float theta = 0.0f;
+int numVertices = 0;
 
 
 std::array<glm::vec3, MaxNumVertices> vertices = {};
@@ -61,62 +56,23 @@ std::array<glm::vec3, MaxNumVertices> colors = {};
 
 GLfloat shape_vertices[MaxNumVertices][3] = { 0 };
 GLfloat shape_colors[MaxNumVertices][3] = { 0 };
+GLshort shape_indices[MaxNumVertices] = { 0 };
 
 // Globals.
-static int isWire = 1; // Is wireframe?
+static int isWire = 0; // Is wireframe?
+static int M = 3; // Number of vertices on one half of the parabola.
 
-// Font selection: A fixed width font with every character fitting in an 8 by 13 pixel rectangle.
-static long font = (long)GLUT_BITMAP_8_BY_13;
-
-std::array<glm::vec3, 8> unique_colors = {
-	glm::vec3(1.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, 1.0f, 0.0f),
-	glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 0.0f),
-	glm::vec3(1.0f, 0.0f, 1.0f),
-	glm::vec3(0.0f, 1.0f, 1.0f),
-	glm::vec3(0.5f, 0.0f, 0.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f)   //white
-};
-
-// Routine to draw a bitmap character string.
-void writeBitmapString(void* font, char* string)
+void createModel()
 {
-	char* c;
-	//glutBitmapCharacter renders a bitmap character using OpenGL.
-	for (c = string; *c != '\0'; c++) glutBitmapCharacter(font, *c);
-}
-
-// Globals.
-static float R = 5.0; // Radius of hemisphere.
-static int p = 10; // Number of longitudinal slices.
-static int q = 10; // Number of latitudinal slices.
-static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate hemisphere.
-
-void createModel(int n)
-{
-	// Array of latitudinal triangle strips, each parallel to the equator, stacked one
-	// above the other from the equator to the north pole.
-	for (int j = 0; j < q; j++)
+	numVertices = 0;
+	for (int i = -M; i <= M; ++i)
 	{
-		// One latitudinal triangle strip.
-		for (int i = 0; i <= p; i++)
-		{
-			vertices[numVertices] = glm::vec3(R * cos((float)(j + 1) / q * PI / 2.0) * cos(2.0 * (float)i / p * PI),
-				R * sin((float)(j + 1) / q * PI / 2.0),
-				-R * cos((float)(j + 1) / q * PI / 2.0) * sin(2.0 * (float)i / p * PI));
-			colors[numVertices] = unique_colors[0];
-			numVertices++;
+		vertices[numVertices] = glm::vec3(50.0 + 50.0 * (float)i / M, 100.0 * (float)(i * i) / (M * M), 0.0);
+		//colors[numVertices] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
+		colors[numVertices] = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			vertices[numVertices] = glm::vec3(R * cos((float)j / q * PI / 2.0) * cos(2.0 * (float)i / p * PI),
-				R * sin((float)j / q * PI / 2.0),
-				-R * cos((float)j / q * PI / 2.0) * sin(2.0 * (float)i / p * PI));
-			colors[numVertices] = unique_colors[0];
-
-			numVertices++;
-		}
+		numVertices++;
 	}
-
 
 	for (int i = 0; i < numVertices; ++i) {
 
@@ -127,6 +83,8 @@ void createModel(int n)
 		shape_colors[i][0] = colors[i][0];
 		shape_colors[i][1] = colors[i][1];
 		shape_colors[i][2] = colors[i][2];
+
+		shape_indices[i] = i;
 	}
 }
 
@@ -145,13 +103,9 @@ void init(void)
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
 
-	createModel(numVertices);
-
-	//projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
-
 	// Camera matrix
 	view = glm::lookAt(
-		glm::vec3(0, 0, 1),		// Camera pos in World Space
+		glm::vec3(0, 0, 2),		// Camera pos in World Space
 		glm::vec3(0, 0, 0),		// and looks at the origin
 		glm::vec3(0, 1, 0)		// Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -160,6 +114,10 @@ void init(void)
 	vao = 0;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_STATIC_DRAW);
 
 
 	points_vbo = 0;
@@ -182,6 +140,8 @@ void init(void)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+	//// Number of vertices on one half of the parabola.
+	createModel();
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -223,31 +183,35 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Update the ortho projection.
-	projection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, -4.0f, 4.0f);
+	projection = glm::ortho(0.0, 100.0, 0.0, 100.0, -4.0, 4.0);
+
+	//Comment this out if you are not interested in changing colors randomly
+	createModel();
 
 	glBindVertexArray(1);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_vertices), shape_vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
 
 	//transformObject(0.4f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
-	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(1.0f, X_AXIS, rotAngle = 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 
 	if (isWire)
 	{
-		glDrawArrays(GL_LINE_LOOP, 0, numVertices);
+		glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+		//glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, NULL);
 	}
 	else
 	{
 		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+		//glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, NULL);
 	}
 
-	// Write labels.
-	//glColor3f(1.0, 0.0, 0.0);
-	glRasterPos3f(15.0, 15.0, 0.0);
-	writeBitmapString((void*)font, (char*)"Ellipse");
+
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -271,13 +235,12 @@ void keyDown(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case '+':
-		numVertices++;
-		// glutPostRedisplay marks the current window as needing to be redisplayed.
-		//glutPostRedisplay();
+		M++;
+		glutPostRedisplay();
 		break;
 	case '-':
-		numVertices--;
-		//glutPostRedisplay();
+		if (M > 2) M--;
+		glutPostRedisplay();
 		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
@@ -313,8 +276,8 @@ int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
-	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Ellipse");
+	glutInitWindowSize(800, 800);
+	glutCreateWindow("Dynamic Polygon");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

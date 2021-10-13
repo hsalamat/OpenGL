@@ -1,16 +1,13 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// DynamicPolygon.cpp
+// @file DynamicPolygonUsingIndices.cpp
+// @brief create Dynamic Polygons Using Indices
+// @attention let's create a model in the init() so we don't change the color randomly
 //
-// This program draws a line loop/TRIANLGE FAN with vertices equally apart on 
-// a fixed circle. The larger the number of vertices the better
-// the loop approximates the circle.
-//
-// Interaction: 
-// Press the space bar to toggle between wirefrime and polygon.
-// Press +/- to increase/decrease the number of vertices of the loop. 
-// Hooman Salamat
+// @note Press the space bar to toggle between wirefrime and polygon.
+// @note Press +/- to increase/decrease the number of vertices of the loop. 
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
 
 
@@ -64,6 +61,7 @@ std::array<glm::vec3, MaxNumVertices> colors = {};
 
 GLfloat shape_vertices[MaxNumVertices][3] = { 0 };
 GLfloat shape_colors[MaxNumVertices][3] = { 0 };
+GLshort shape_indices[MaxNumVertices] = { 0 };
 
 // Globals.
 static int isWire = 0; // Is wireframe?
@@ -89,6 +87,8 @@ void createModel(int n)
 		shape_colors[i][0] = colors[i][0];
 		shape_colors[i][1] = colors[i][1];
 		shape_colors[i][2] = colors[i][2];
+
+		shape_indices[i] = i;
 	}
 }
 
@@ -107,6 +107,7 @@ void init(void)
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
 
+	projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -119,6 +120,11 @@ void init(void)
 	vao = 0;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	ibo = 0;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_STATIC_DRAW);
 
 
 	points_vbo = 0;
@@ -186,9 +192,11 @@ void display(void)
 	projection = glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, -4.0f, 4.0f);
 
 	//Comment this out if you are not interested in changing colors randomly
-	createModel(numVertices);
+	//createModel(numVertices);
 
 	glBindVertexArray(1);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_vertices), shape_vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
@@ -200,11 +208,13 @@ void display(void)
 
 	if (isWire)
 	{
-		glDrawArrays(GL_LINE_LOOP, 0, numVertices);
+		//glDrawArrays(GL_LINE_LOOP, 0, numVertices);
+		glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, NULL);
 	}
 	else
 	{
-		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+		//glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+		glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, NULL);
 	}
 
 

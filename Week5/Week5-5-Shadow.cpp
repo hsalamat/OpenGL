@@ -150,7 +150,7 @@ void init(void)
 // Enable depth test.
 	glEnable(GL_DEPTH_TEST);
 
-	glClearColor(1.0, 1.0, 1.0, 1.0); // white background
+	glClearColor(1.0, 1.0, 0, 1.0); // white background
 }
 
 //---------------------------------------------------------------------
@@ -194,6 +194,10 @@ void display(void)
 	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(glm::sin(theta), 2.0f, glm::cos(theta)));
+	//Ordering the GPU to start the pipeline
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
 
 	glBindVertexArray(2);
 
