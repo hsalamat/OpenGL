@@ -1,9 +1,9 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// TextureDemo2.cpp
-// Checkerboard
-// Hooman Salamat
+// TextureObjectDemo1.cpp
+// Use the texture class that we have created
+// @author: Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
 
 
@@ -17,7 +17,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtc\type_ptr.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "Texture.h"
 #include <array>
 using namespace std;
 
@@ -56,6 +56,8 @@ int lastX, lastY;
 // Texture variables.
 GLuint textureID;
 GLint width, height, bitDepth;
+Texture* pTexture = NULL;
+GLuint gSampler;
 
 GLshort cube_indices[] = {
 	// Front.
@@ -63,21 +65,22 @@ GLshort cube_indices[] = {
 	2, 0, 1
 };
 
+//! Add the texture coordinates to the vertices
 GLfloat cube_vertices[] = {
 	//	x,		y,		z,	  u,	v
-		-1.0f, -1.0f, 1.0f,	0.0f, 0.0f,		// 0.
-		1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,		// 1.
-		1.0f,   1.0f, 1.0f, 1.0f, 1.0f,		// 2.
-		-1.0f,  1.0f, 1.0f, 0.0f, 1.0f		// 3.
+		-1.0f, -1.0f, 1.0f,	0.0f, 0.0f,		// 0. Bottom Left
+		1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,		// 1. Bottom Right
+		1.0f,   1.0f, 1.0f, 1.0f, 1.0f,		// 2. Top Right
+		-1.0f,  1.0f, 1.0f, 0.0f, 1.0f		// 3. Top Left
 };
 
 //step2: try this - pay attention to texture coordinate: (u,v) = (0.5f, 1.0f)
 //GLfloat cube_vertices[] = {
-//	//	x,		y,		z,	  u,	v
+//		//x,		y,		z,	  u,	v
 //		-1.0f, -1.0f, 1.0f,	0.0f, 0.0f,		// 0.
 //		1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,		// 1.
 //		0.0f,   1.0f, 1.0f, 0.5f, 1.0f,		// 2.
-//		//-1.0f,  1.0f, 1.0f, 0.0f, 1.0f		// 3.
+//		-1.0f,  1.0f, 1.0f, 0.0f, 1.0f		// 3.
 //};
 
 //step3: try this - pay attention to vertex coordinate: (x,y,z) = (1.0f,   2.0f, 1.0f)
@@ -90,9 +93,9 @@ GLfloat cube_vertices[] = {
 //};
 
 
-//step4: the world-space polygon is mapped to a 3 X 2 rectangle in texture space
+////step4: the world-space polygon is mapped to a 3 X 2 rectangle in texture space
 //GLfloat cube_vertices[] = {
-//		x,		y,		z,	  u,	v
+//	//	x,		y,		z,	  u,	v
 //		-1.0f, -1.0f, 1.0f,	-1.0f, 0.0f,	// 0.
 //		1.0f,  -1.0f, 1.0f, 2.0f, 0.0f,	    // 1.
 //		1.0f,   1.0f, 1.0f, 2.0f, 2.0f,		// 2.
@@ -111,8 +114,6 @@ program,
 vertexShaderId,
 fragmentShaderId;
 
-static unsigned char chessboard[64][64][4]; // Storage for chessboard image.
-
 
 // Globals.
 static int isWire = 0; // Is wireframe?
@@ -126,75 +127,59 @@ void resetView()
 	yaw = -90.0f;
 }
 
-// Create 64 x 64 RGBA image of a chessboard.
-//j=0-7 black, j=8-15 white, j=16-23 black, j=24-31 white
-void createChessboard(void)
-{
-	int i, j;
-	for (i = 0; i < 64; i++)
-		for (j = 0; j < 64; j++)
-			if ((((i / 8) % 2) && ((j / 8) % 2)) || (!((i / 8) % 2) && !((j / 8) % 2)))
-			{
-				chessboard[i][j][0] = 0x00;
-				chessboard[i][j][1] = 0x00;
-				chessboard[i][j][2] = 0x00;
-				chessboard[i][j][3] = 0xFF;
-			}
-			else
-			{
-				chessboard[i][j][0] = 0xFF;
-				chessboard[i][j][1] = 0xFF;
-				chessboard[i][j][2] = 0xFF;
-				chessboard[i][j][3] = 0xFF;
-			}
-}
-
-void loadTexture()
-{
-    //we are making our own image
-	//stbi_set_flip_vertically_on_load(true);
-
-	//unsigned char* image = stbi_load("Media/spheremap.png", &width, &height, &bitDepth, 0);
-	//if (!image) {
-	//	cout << "Unable to load file!" << endl;
-	//	// Could add a return too if you modify init.
-	//}
-
-
-	glGenTextures(1, &textureID);
-	glActiveTexture(GL_TEXTURE0);
-
-	// Create texture object 
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	// Generate internal texture.
-	createChessboard();
-
-	// Specify image data for currently active texture object.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 
-		64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, chessboard);
-
-	// Set texture parameters for wrapping.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//step1-1: Comment out the line above. Change texture coordinates to be 3x2 (step4!)
-	//This causes the wrapping mode to be clamped to the edge in the s - direction
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//step1-2: Comment out the line above.
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	// Set texture parameters for filtering. This causes the wrapping mode to be clamped to the edge in the t - direction
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-
-	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Clean up. But we don't want to unbind the texture or we cannot use it.
-	//stbi_image_free(image);
-}
+//void loadTexture(std::string filename)
+//{
+//	stbi_set_flip_vertically_on_load(true);
+//
+//	//filename.c_str() to convert to constant char*
+//	//bitDepth:how many bit perpixel
+//	//unsigned char* image = stbi_load("Media/spheremap.png", &width, &height, &bitDepth, 0);
+//	unsigned char* image = stbi_load(filename.c_str(), &width, &height, &bitDepth, 0);
+//	if (!image) {
+//		cout << "Unable to load file!" << stbi_failure_reason() <<endl;
+//
+//		exit(0);
+//		// Could add a return too if you modify init.
+//	}
+//
+//
+//	//!Generate a handler for texture object
+//	glGenTextures(1, &textureID);
+//
+//
+//	//!This tells openGL if the texture object is 1D, 2D, 3D, etc..
+//	glBindTexture(GL_TEXTURE_2D, textureID);
+//
+//	/// @note: all texture objects cannot be available to the shader. 
+//	/// That's why we have texture units sitting between texture objects and shaders.
+//	/// Then shaders samples from the texture unit. 
+//	/// So between draw calls, we can point to a different texture unit.
+//	int textureUnits = 0;
+//	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
+//	cout << "The number of my GPU texture units: " << textureUnits;
+//
+//	//! Load the texture object from CPU to GPU
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, 
+//		height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+//
+//	//! Configure the texture state
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//
+//
+//	//!Activate a texture unit! 
+//	glActiveTexture(GL_TEXTURE0);
+//
+//	//!Set the index of the texture unit into the sampler
+//	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+//
+//	glGenerateMipmap(GL_TEXTURE_2D);
+//
+//	// Clean up. But we don't want to unbind the texture or we cannot use it.
+//	stbi_image_free(image);
+//}
 
 void createBuffer()
 {
@@ -213,8 +198,9 @@ void createBuffer()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cube_vertices[0]) * 5, 0);
 	glEnableVertexAttribArray(0);
 
-	// Now for the UV/ST values.
+	// Now for the UV/ST values, set the layout of the vertex buffer
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(cube_vertices[0]) * 5, (void*)(sizeof(cube_vertices[0]) * 3));
+	//Enable the texture coordinate attribute
 	glEnableVertexAttribArray(2);
 
 	colors_vbo = 0;
@@ -226,8 +212,8 @@ void createBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
-}
 
+}
 void init(void)
 {
 	vertexShaderId = setShader((char*)"vertex", (char*)"triangles.vert");
@@ -239,17 +225,27 @@ void init(void)
 	glUseProgram(program);
 
 	modelID = glGetUniformLocation(program, "mvp");
+	gSampler = glGetUniformLocation(program, "texture0");
+	assert(gSampler != 0xFFFFFFFF);
 	
 	resetView();
 
-	loadTexture();
 
-	createBuffer();	
+	glUniform1i(gSampler, 0);
+	//loadTexture("Media/spheremap.png");
+	pTexture = new Texture(GL_TEXTURE_2D, "Media/spheremap.png", GL_RGB);
+	pTexture->Bind(GL_TEXTURE0);
+	if (!pTexture->Load()) {
+		exit(0);
+	}
+
+
+	createBuffer();
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
 
-	glClearColor(0.0, 0.0, 1.0, 1.0); // blue background
+	glClearColor(1.0, 1.0, 1.0, 1.0); // black background
 }
 
 //---------------------------------------------------------------------
@@ -298,14 +294,16 @@ void display(void)
 	glBindVertexArray(vao);
 
 	// Update the projection or view if perspective.
-	//projection = glm::ortho(-zoom + osH, zoom + osH, -zoom + osV, zoom + osV, 0.0f, 100.0f);
 	projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 
 	calculateView();
-	transformObject(1.0f, YZ_AXIS, rotAngle -= 0, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.4f, YZ_AXIS, rotAngle -= 0, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	//step1: try the following to see different texture maps effect
+	//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)(sizeof(cube_indices[0]) * 3));
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
