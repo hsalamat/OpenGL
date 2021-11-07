@@ -1,13 +1,14 @@
-//texture2D Array Demo
-
-//When the 3 dimensional texture image is specified, 
-//then the depth has to be the number of images 
-//which have to be stored in the array(e.g.imageCount).
-//The widthand the height parameter represent the width
-//and height of 1 tile(e.g.tileW, tileH).The layer should be 0 and the border parameter has to be 0. See glTexImage3D.glTexImage3D creates the data store for the texture image.The memory 
-//which is required for the textures is reserved(GPU).
-
-// Hooman Salamat
+/** @file Week10-6-Texture2DArrayDemo.cpp
+ *  @brief texture2D Array Demo
+ *  When the 3 dimensional texture image is specified, 
+ *  then the depth has to be the number of images 
+ *  which have to be stored in the array(e.g.imageCount).
+ *  The widthand the height parameter represent the width
+ *  and height of 1 tile(e.g.tileW, tileH).The layer should be 0 and the border parameter has to be 0. See glTexImage3D.glTexImage3D creates the data store for the texture image.The memory 
+ *  which is required for the textures is reserved(GPU).
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

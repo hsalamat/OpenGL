@@ -1,5 +1,9 @@
-//Skybox Demo
-// Hooman Salamat
+
+/** @file Week10-5-SkyboxDemo.cpp
+ *  @brief Skybox Demo
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

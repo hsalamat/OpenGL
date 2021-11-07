@@ -1,9 +1,8 @@
-
-// PerspectiveProjection
-// Perspective view of a color cube using Perspective()
-//
-// Colors are assigned to each face!
-// Hooman Salamat
+/** @file Week10-2-CubeNoTexture.cpp
+ *  @brief Orthographic view of a color cube. Colors are assigned to each face!
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -13,6 +12,8 @@
 #include "prepShader.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <array>
 using namespace std;
 

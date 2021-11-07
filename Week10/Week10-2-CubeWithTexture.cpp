@@ -1,9 +1,9 @@
 
-// PerspectiveProjection
-// Perspective view of a color cube using Perspective()
-//
-// Colors are assigned to each face!
-// Hooman Salamat
+/** @file Week10-2-CubeWithTexture.cpp
+ *  @brief Orthographic view of a cube. Textures are assigned to each face!
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -93,15 +93,27 @@ std::array<glm::vec3, 8> unique_vertices = {
 };
 
 
+//std::array<glm::vec3, 8> unique_colors = {
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f),
+//	glm::vec3(1.0f, 1.0f, 1.0f)
+//};
+
+
 std::array<glm::vec3, 8> unique_colors = {
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f)
+	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f),
+	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(1.0f, 1.0f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 1.0f),
+	glm::vec3(0.0f, 1.0f, 1.0f),
+	glm::vec3(0.5f, 0.0f, 0.0f),
+	glm::vec3(1.0f, 1.0f, 1.0f)   //white
 };
 
 std::array<glm::vec2, 6> unique_texCoords = {

@@ -1,8 +1,7 @@
-/** @file Week10-1-fieldAndSkyFiltered.cpp
- *  @brief This program enhances fieldAndSky.cpp to animate the sky texture by applying a translation 
- *  to the current texture matrix.
+/** @file Week10-2-fieldAndSkyFiltered.cpp
+ *  @brief This program enhances fieldAndSky.cpp using two texture units
  *  @note: Press the up and down arrow keys to move the viewpoint over the field.
- *  @note: Press the left and right arrow keys to cycle through the filters.
+ *  @note: Filter won't work because we are loading the textures in init()!
  *  @note: Press space to toggle between animation on and off.
  *  @author Hooman Salamat
  *  @bug No known bugs.
@@ -55,8 +54,10 @@ float rotAngle = 0.0f;
 bool mouseFirst = true, mouseClicked = false;
 int lastX, lastY;
 
+static enum object { FIELD, SKY };
+
 // Texture variables.
-GLuint textureID;
+GLuint textureID[2], objectLoc;
 GLint width, height, bitDepth;
 
 static float d = 0.0; // Distance parameter in gluLookAt().
@@ -209,21 +210,22 @@ void loadGrassTexture()
 		// Could add a return too if you modify init.
 	}
 
-	glGenTextures(1, &textureID);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image0);
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
 	setFilter();
 
 
-	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "grassTex"), 0);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// Clean up. But we don't want to unbind the texture or we cannot use it.
@@ -243,19 +245,20 @@ void loadSkyTexture()
 	}
 
 	// Bind sky image to texture object texture1
-	glGenTextures(1, &textureID);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureID[1]);
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image0);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	setFilter();
 
-	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	glUniform1i(glGetUniformLocation(program, "skyTex"), 1);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// Clean up. But we don't want to unbind the texture or we cannot use it.
@@ -279,7 +282,6 @@ void createBuffer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(grass_vertices), grass_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(grass_vertices[0]) * 5, 0);
 	glEnableVertexAttribArray(0);
-
 	// Now for the UV/ST values.
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(grass_vertices[0]) * 5, (void*)(sizeof(grass_vertices[0]) * 3));
 	glEnableVertexAttribArray(2);
@@ -291,6 +293,7 @@ void createBuffer()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -307,19 +310,18 @@ void createBuffer()
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sky_vertices), sky_vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(sky_vertices[0]) * 5, 0);
-	glEnableVertexAttribArray(0);
-
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(sky_vertices[0]) * 5, 0);
+	glEnableVertexAttribArray(3);
 	// Now for the UV/ST values.
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(sky_vertices[0]) * 5, (void*)(sizeof(sky_vertices[0]) * 3));
-	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(sky_vertices[0]) * 5, (void*)(sizeof(sky_vertices[0]) * 3));
+	glEnableVertexAttribArray(5);
 
 	colors_vbo = 0;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(4);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
@@ -328,20 +330,56 @@ void createBuffer()
 }
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"cube.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"cube.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"vertexshader.glsl");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"fragmentshader.glsl");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
 	glLinkProgram(program);
 	glUseProgram(program);
 
+
+	GLint Success;
+	glGetProgramiv(program, GL_LINK_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Failed to link program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
+	}
+
+	glValidateProgram(program);
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Invalid Shader program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
+	}
+	glUseProgram(program);
+
 	modelID = glGetUniformLocation(program, "mvp");
 	angleParam = glGetUniformLocation(program, "angle");
+	//you have to do this after linking the shader program
+	objectLoc = glGetUniformLocation(program, "object");
+	if (objectLoc == -1) {
+		cout << "Error getting uniform location of 'object'" << endl;
+		exit(1);
+	}
+
 	
 	resetView();
 
 	createBuffer();
+
+	// Create texture ids.
+	glGenTextures(2, textureID);
+	loadGrassTexture();
+	loadSkyTexture();
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -390,32 +428,32 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(1);
-	loadGrassTexture();
+
 	// Update the projection or view if perspective.
-	projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 5.0f, 100.0f);
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0);
 
 	calculateView();
 	transformObject(0.4f, YZ_AXIS, rotAngle -= 0, glm::vec3(0.0f, 0.0f, 0.0f));
 	//no animation for grass
 	glUniform1f(angleParam, 0.0f);
-	
-	//Ordering the GPU to start the pipeline
+	glUniform1ui(objectLoc, FIELD);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 	
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 
 	glBindVertexArray(2);
-	loadSkyTexture();
+
 	// Update the projection or view if perspective.
-	projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0);
 
 	calculateView();
 	transformObject(0.4f, YZ_AXIS, rotAngle -= 0, glm::vec3(0.0f, 0.0f, 0.0f));
 	//animation for sky
 	glUniform1f(angleParam, angle);
-	
-	//Ordering the GPU to start the pipeline
+	glUniform1ui(objectLoc, SKY);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.

@@ -1,10 +1,9 @@
 
-///////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////         
-//Dice demo - using spritesheet
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////// 
-
+/** @file Week10-3-DiceDemo.cpp
+ *  @brief Dice demo - using spritesheet
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -382,7 +381,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 768);
-	glutCreateWindow("Texture Demo 1");
+	glutCreateWindow("Dice Demo");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

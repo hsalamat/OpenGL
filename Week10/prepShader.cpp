@@ -40,6 +40,17 @@ int setShader(char* shaderType, char* shaderFile)
    glShaderSource(shaderId, 1, (const char**) &shader, NULL); 
    glCompileShader(shaderId); 
 
+   GLint shader_compiled;
+   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &shader_compiled);
+   if (shader_compiled != GL_TRUE)
+   {
+	   GLsizei log_length = 0;
+	   GLchar message[1024];
+	   glGetShaderInfoLog(shaderId, 1024, &log_length, message);
+	   // Write the error to a log
+   }
+
+
    return shaderId;
 }
 
