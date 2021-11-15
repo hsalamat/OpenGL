@@ -1,9 +1,13 @@
 
-///////////////////////////////////////////////////////////////////////
-//
-// Sphere.cpp
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week11-1-sphere.cpp
+ *  @brief Rotating Sphere
+ *  Orthographic projection of a sphere
+ *  For our model, we use our approximation of a sphere geometry that we created in the Week5.
+ *  @note press WASD to move the rotating sphere
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
+
 
 
 #include <iostream>

@@ -1,9 +1,29 @@
 
-// PerspectiveProjection
-// Perspective view of a color cube using Perspective()
-//
-// Colors are assigned to each face!
-// Hooman Salamat
+/** @file Week11-6-cube-phong-lambertian.cpp
+ *  @brief the Phong shading model and Lambertian reflection model
+ *  @note press n,g,b to change the diffuse color of the cube
+ *  @note press arrow keys to move the light position
+ *  @note: camera: eye position is set using polar coordinates
+        zNear = 0.5;
+		zFar = 3.0;
+
+		radius = 1.0;
+		theta = 0.0;
+		phi = 0.0;
+
+        you can also change them dynamically using the following keys:
+		case 'z': zNear *= 1.1; zFar *= 1.1; break;
+		case 'Z': zNear *= 0.9; zFar *= 0.9; break;
+		case 'r': radius *= 2.0; break;
+		case 'R': radius *= 0.5; break;
+		case 'o': theta += dr; break;
+		case 'O': theta -= dr; break;
+		case 'p': phi += dr; break;
+		case 'P': phi -= dr; break;
+		case ' ' : reset
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -274,7 +294,7 @@ void display(void)
 
 	//projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.5f, 3.0f);
 	//projection = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
-	projection = glm::ortho(-1.0f , 1.0f, -1.0f, 1.0f, -200.0f, 200.0f);
+	projection = glm::ortho(-1.0f , 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
 
 
 

@@ -1,23 +1,24 @@
-﻿
-///////////////////////////////////////////////////////////////////////
-//Phong Shading + Lambertian Reflection Model
-//In our previous example, the model - view matrix for normals was identical 
-//to our sphere modelview matrix.However, a separate normal matrix  is needed 
-//if there is non-uniform scaling. let’s change our code to scale our sphere by half along x-axis.
-//When we calculate lighting, we need the cosine of the angle between light direction l and 
-//the normal to the surface n, and the cosine of the angle between view direction v and n 
-//by calculating the dot products of l.n and v.n. When we transform to a different frame, 
-//we go from v to v’(Mv), where M is the modelview matrix. We must also transform n to n’ 
-//by a matrix like N such that these cosines are not changed. Otherwise our light calculation is wrong.
-//if v = [V1, V2, V3] and n = [N1, N2, N3], and T means transpose, then the dot product of v.n:
-//v.n = V1N1 + V2N2 + V3N3 = vTn
-//v.n = vTn = v′.n′ = (Mv)T(Nn) = vTMTNn => vTn = vTMTNn
-//therefore, MTN = I
-//meaning our normal model view matrix N is equal to :
-//N = (MT)-1
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
-
+﻿/** @file Week11-5-phong-lambertian-scaling.cpp
+ *  @brief the Phong shading model and Lambertian reflection model
+ *  In our previous example, the model - view matrix for normals was identical
+ *  to our sphere modelview matrix.However, a separate normal matrix  is needed
+ *  if there is non-uniform scaling. let’s change our code to scale our sphere by half along x-axis.
+ *  When we calculate lighting, we need the cosine of the angle between light direction l and
+ *  the normal to the surface n, and the cosine of the angle between view direction v and n
+ *  by calculating the dot products of l.n and v.n. When we transform to a different frame,
+ *  we go from v to v’(Mv), where M is the modelview matrix. We must also transform n to n’
+ *  by a matrix like N such that these cosines are not changed. Otherwise our light calculation is wrong.
+ *  if v = [V1, V2, V3] and n = [N1, N2, N3], and T means transpose, then the dot product of v.n:
+ *  v.n = V1N1 + V2N2 + V3N3 = vTn
+ *  v.n = vTn = v′.n′ = (Mv)T(Nn) = vTMTNn => vTn = vTMTNn
+ *  therefore, MTN = I
+ *  meaning our normal model view matrix N is equal to :
+ *  N = (MT)-1
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

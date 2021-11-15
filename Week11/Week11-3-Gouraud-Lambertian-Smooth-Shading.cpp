@@ -1,9 +1,13 @@
-///////////////////////////////////////////////////////////////////////
-//Gouraud "Smooth" Shading + Lambertian Reflection Model
-//the Gouraud shading model and Lambertian reflection model  with constant shading(single diffuse color per triangle).
-//Instead of calculating normals, use the true normal. It's sphere, the position of vertex is the normal!
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week11-3-gouraud-lambertian-smooth-shading.cpp
+ *  @brief Gouraud "Smooth" Shading + Lambertian Reflection Model
+ *  the Gouraud shading model and Lambertian reflection model  with constant shading(single diffuse color per triangle).
+ *  Instead of calculating normals, use the true normal. It's sphere, the position of vertex is the normal!
+ *  Still not so great, but we are making progress.
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

@@ -1,11 +1,14 @@
-
-///////////////////////////////////////////////////////////////////////
-//let’s go ahead and create our first local lighting model 
-//the Gouraud shading model and Lambertian reflection model  with constant shading(single diffuse color per triangle).
-//For our model, we use our approximation of a sphere geometry that we created in the Week5.As you see below.
-//The Gouraud shading calculations are done in the vertex shader!
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week11-2-gouraud-lambertian.cpp
+ *  @brief create our first local lighting model 
+ *  let’s go ahead and create our first local lighting model 
+ *  the Gouraud shading model and Lambertian reflection model  with constant shading(single diffuse color per triangle).
+ *  As you see below. The Gouraud shading calculations are done in the vertex shader!
+ *  Not so great, but we need to start from somewhere.
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 
 #include <iostream>

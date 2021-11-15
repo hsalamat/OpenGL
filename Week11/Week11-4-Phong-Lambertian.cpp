@@ -1,11 +1,11 @@
-
-///////////////////////////////////////////////////////////////////////
-//Phong Shading + Lambertian Reflection Model
-//the Phong shading model and Lambertian reflection model  
-//No code change in the application. Magic happens in the shader!
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
-
+/** @file Week11-4-phong-lambertian.cpp
+ *  @brief the Phong shading model and Lambertian reflection model
+ *  No code change in the application. Magic happens in the shader!
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
