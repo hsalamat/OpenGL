@@ -59,9 +59,9 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, 0.0f,0.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f,1.0f);
+glm::vec4 materialDiffuse = glm::vec4(0.8f, 0.5f, 0.1f,1.0f);
 
 
 
@@ -181,9 +181,9 @@ void setupBuffers()
 	glEnableVertexAttribArray(2);
 }
 void  setupLights() {
-	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z,1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z, lightDiffuse.w);
+	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, materialDiffuse.w);
+	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 }
 
 void init(void)
