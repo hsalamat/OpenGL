@@ -1,7 +1,10 @@
-///////////////////////////////////////////////////////////////////////
-//Phong Shading + Phong Blinn Reflection Model
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week12-3-PhongShading-PhongBlinnReflection.cpp
+ *  @brief Phong Shading (Fragment Shader) + PhongBlinn Reflection Model (Ambient + Diffuse + Specular + halfway vector)
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

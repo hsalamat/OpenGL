@@ -1,7 +1,10 @@
-///////////////////////////////////////////////////////////////////////
-//Phong Shading + Phong Reflection Model
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week12-7-SphereDemo.cpp
+ *  @brief Demoing specular light on a rotaitng sphere + Light.h
+ *  @note press WASD to move the sphere
+ *  @note press arrow keys to move the direction of the lights
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -12,6 +15,7 @@
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include <array>
+#include "light.h"
 using namespace std;
 
 #define X_AXIS glm::vec3(1,0,0)
@@ -51,15 +55,25 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
-glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+//glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
+//glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
+//glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
+//glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+//
+//glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+//glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
+//glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+//GLfloat materialShininess = 20.0;
 
-glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
-glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-GLfloat materialShininess = 20.0;
+// Light variables.
+AmbientLight aLight(glm::vec3(1.0f, 1.0f, 0.0f),	// Ambient colour.
+	0.1f);							// Ambient strength.
+
+DirectionalLight dLight(glm::vec3(0.0f, 1.0f, 1.0f), // Direction.
+	glm::vec3(1.0f, 1.0f, 0.5f),  // Diffuse colour.
+	0.8f);		// Diffuse strength.
+
+Material mat = { 2.0f, 20.0 };
 
 
 
@@ -179,22 +193,28 @@ void setupBuffers()
 	glEnableVertexAttribArray(2);
 }
 void  setupLights() {
-	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
+	// Setting ambient Light.
+	glUniform3f(glGetUniformLocation(program, "aLight.ambientColour"), aLight.ambientColour.x, aLight.ambientColour.y, aLight.ambientColour.z);
+	glUniform1f(glGetUniformLocation(program, "aLight.ambientStrength"), aLight.ambientStrength);
 
-	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, 1.0f);
-	glUniform1f(glGetUniformLocation(program, "shininess"), materialShininess);
+	// Setting directional light.
+	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColour"), dLight.diffuseColour.x, dLight.diffuseColour.y, dLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
+
+	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
+
+	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
+
+	// Setting Material.
+	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), mat.specularStrength);
+	glUniform1f(glGetUniformLocation(program, "mat.shininess"), mat.shininess);
 
 }
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere4.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere4.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"triangles4.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"triangles4.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -202,10 +222,10 @@ void init(void)
 	glUseProgram(program);
 
 	//modelViewID = glGetUniformLocation(program, "modelViewMatrix");
-	viewID = glGetUniformLocation(program, "viewMatrix");
-	modelID = glGetUniformLocation(program, "modelMatrix");
-	projectionID = glGetUniformLocation(program, "projectionMatrix");
-	normalID = glGetUniformLocation(program, "normalMatrix");
+	viewID = glGetUniformLocation(program, "view");
+	modelID = glGetUniformLocation(program, "model");
+	projectionID = glGetUniformLocation(program, "projection");
+	//normalID = glGetUniformLocation(program, "normalMatrix");
 
 	// frustum parameters: left, right, bottom, top, nearVal, farVal
 	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0); // In world coordinates
@@ -348,22 +368,22 @@ void keyDownSpecial(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		lightPosition.y += 0.1;
+		dLight.direction.y += 0.1;
 		break;
 	case GLUT_KEY_DOWN:
-		lightPosition.y -= 0.1;
+		dLight.direction.y -= 0.1;
 		break;
 	case GLUT_KEY_LEFT:
-		lightPosition.x += 0.1;
+		dLight.direction.x -= 0.1;
 		break;
 	case GLUT_KEY_RIGHT:
-		lightPosition.x -= 0.1;
+		dLight.direction.x += 0.1;
 		break;
 	case GLUT_KEY_PAGE_UP:
-		lightPosition.z += 0.1;
+		dLight.direction.z += 0.1;
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		lightPosition.z -= 0.1;
+		dLight.direction.z -= 0.1;
 	}
 }
 
@@ -392,7 +412,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Phong Shading + Phong Reflection Model");
+	glutCreateWindow("specular light on a rotaitng sphere");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();

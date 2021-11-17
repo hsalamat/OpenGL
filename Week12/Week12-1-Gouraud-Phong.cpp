@@ -1,7 +1,11 @@
-///////////////////////////////////////////////////////////////////////
-//Phong Shading + Phong Reflection Model
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week12-1-Goraud-phong.cpp
+ *  @brief Gouraud "Smooth" Shading (Vertex Shader) + Phong Reflection Model (Ambient + Diffuse + Specular)
+ *  @note press WASD to move the rotating sphere
+ *  @note press arrow keys to move the light position
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
+
 
 #include <iostream>
 #include "stdlib.h"
@@ -30,7 +34,7 @@ float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mv, view, projection;
 
-const int Ndivisions = 5;
+const int Ndivisions = 5; 
 const int NumTetrahedrons = 1024; // 4^5 tetrahedrons      
 const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
@@ -51,13 +55,13 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
+glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,1.0f);
 glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
+glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f,1.0f);
 glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 GLfloat materialShininess = 20.0;
 
@@ -110,11 +114,11 @@ void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = a;
-
+	
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = b;
-
+	
 	normals1[Index] = qNormal;
 	colors1[Index] = tColor;
 	vertices1[Index++] = c;
@@ -179,22 +183,21 @@ void setupBuffers()
 	glEnableVertexAttribArray(2);
 }
 void  setupLights() {
-	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "lightAmbient"), lightAmbient.x, lightAmbient.y, lightAmbient.z, lightAmbient.w);
+	glUniform4f(glGetUniformLocation(program, "lightDiffuse"), lightDiffuse.x, lightDiffuse.y, lightDiffuse.z, lightDiffuse.w);
+	glUniform4f(glGetUniformLocation(program, "lightSpecular"), lightSpecular.x, lightSpecular.y, lightSpecular.z, lightSpecular.w);
 	glUniform4f(glGetUniformLocation(program, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z, lightPosition.w);
 
-	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, 1.0f);
-	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "materialAmbient"), materialAmbient.x, materialAmbient.y, materialAmbient.z, materialAmbient.w);
+	glUniform4f(glGetUniformLocation(program, "materialDiffuse"), materialDiffuse.x, materialDiffuse.y, materialDiffuse.z, materialDiffuse.w);
+	glUniform4f(glGetUniformLocation(program, "materialSpecular"), materialSpecular.x, materialSpecular.y, materialSpecular.z, materialSpecular.w);
 	glUniform1f(glGetUniformLocation(program, "shininess"), materialShininess);
-
-}
+	}
 
 void init(void)
 {
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere4-2.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere4-2.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"sphere3.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere3.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -392,7 +395,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Phong Shading + Phong Reflection Model");
+	glutCreateWindow("Gouraud Smooth Shading + Phong Reflection Model");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();
