@@ -256,7 +256,6 @@ void display(void)
 	glBindVertexArray(vao);
 	// Draw all shapes.
 
-	glBindTexture(GL_TEXTURE_2D, leafTexture);
 	g_grid.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -60.0f, glm::vec3(-15.0f, 0.0f, 0.0f));
 	glDrawElements(GL_LINE_STRIP, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);

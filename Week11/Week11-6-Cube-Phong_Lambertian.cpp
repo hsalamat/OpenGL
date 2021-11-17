@@ -305,6 +305,13 @@ void display(void)
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Try GL_LINE_STRIP too!
 
+	//transformObject(0.2f, X_AXIS, rotAngle = 0.0 , glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.2f, YZ_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.5f, 0.5f, 0.0f));
+
+
+	//Ordering the GPU to start the pipeline
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Try GL_LINE_STRIP too!
+
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 	glutSwapBuffers(); // Now for a potentially smoother render.
