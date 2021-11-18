@@ -158,26 +158,10 @@ void setupShaders()
 
 void setupVAO()
 {
-	vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	ibo = 0;
-	glGenBuffers(1, &ibo);
-
-	points_vbo = 0;
-	glGenBuffers(1, &points_vbo);
-
-	colors_vbo = 0;
-	glGenBuffers(1, &colors_vbo);
-
-	uv_vbo = 0;
-	glGenBuffers(1, &uv_vbo);
-
-	normals_vbo = 0;
-	glGenBuffers(1, &normals_vbo);
-
-	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+	// All VAO/VBO data now in Shape.h! But we still need to do this AFTER OpenGL is initialized.
+	g_grid.BufferShape();
+	g_cube.BufferShape();
+	g_prism.BufferShape();
 }
 
 void init(void)
@@ -253,26 +237,22 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(vao);
-	// Draw all shapes.
+	glBindTexture(GL_TEXTURE_2D, metalTexture); // Use this texture for all shapes.
 
-	g_grid.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -60.0f, glm::vec3(-15.0f, 0.0f, 0.0f));
-	glDrawElements(GL_LINE_STRIP, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	// Grid.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	g_grid.DrawShape(GL_LINE_STRIP);
 
-	angle += 2.01;
+	// Cube.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(6.0f, 0.0f, 0.0f));
+	g_cube.DrawShape(GL_TRIANGLES);
 
-	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(5.0f, 3.0f, 2.0f));
-	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	// Prism.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 0.0f, 0.0f));
+	g_prism.DrawShape(GL_TRIANGLES);
 
-	glBindTexture(GL_TEXTURE_2D, metalTexture);
-	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(3.0f, 2.0f, 2.0f));
-	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glBindVertexArray(0); // Done writing.
 	glutSwapBuffers(); // Now for a potentially smoother render.
 }
 

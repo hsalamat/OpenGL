@@ -2,20 +2,20 @@
 
 #include <iostream>
 #include <vector>
-#include "glm\glm.hpp"
 #define PI 3.14159265358979324
 using namespace std;
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 
 struct Shape
 {
+protected:
 	vector<GLshort> shape_indices;
 	vector<GLfloat> shape_vertices;
 	vector<GLfloat> shape_colors;
 	vector<GLfloat> shape_uvs;
 	vector<GLfloat> shape_normals;
+	GLuint vao, ibo, points_vbo, colors_vbo, uv_vbo, normals_vbo;
 
+public:
 	~Shape()
 	{
 		shape_indices.clear();
@@ -30,47 +30,64 @@ struct Shape
 		shape_normals.shrink_to_fit();
 	}
 	GLsizei NumIndices() { return shape_indices.size(); }
-	void BufferShape(GLuint* ibo, GLuint* points_vbo, GLuint* colors_vbo, GLuint* uv_vbo, GLuint* normals_vbo)
+	void BufferShape()
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices[0]) * shape_indices.size(), &shape_indices.front(), GL_STATIC_DRAW);
+		vao = 0;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, *points_vbo);
+		ibo = 0;
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices[0]) * shape_indices.size(), &shape_indices.front(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		points_vbo = 0;
+		glGenBuffers(1, &points_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(shape_vertices[0]) * shape_vertices.size(), &shape_vertices.front(), GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(shape_vertices[0]) * 3, 0);
 		glEnableVertexAttribArray(0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, *colors_vbo);
+		colors_vbo = 0;
+		glGenBuffers(1, &colors_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors[0]) * shape_colors.size(), &shape_colors.front(), GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
-		glBindBuffer(GL_ARRAY_BUFFER, *uv_vbo);
+		uv_vbo = 0;
+		glGenBuffers(1, &uv_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, uv_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(shape_uvs[0]) * shape_uvs.size(), &shape_uvs.front(), GL_STATIC_DRAW);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(2);
 
-		glBindBuffer(GL_ARRAY_BUFFER, *normals_vbo);
+		// Uncomment for DirectionalLight example.
+		normals_vbo = 0;
+		glGenBuffers(1, &normals_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(shape_normals[0]) * shape_normals.size(), &shape_normals.front(), GL_STATIC_DRAW);
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(3);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 	}
-	void ColorShape(GLfloat r, GLfloat g, GLfloat b)
+	void RecolorShape(GLfloat r, GLfloat g, GLfloat b)
 	{
-		shape_colors.clear();
-		shape_colors.shrink_to_fit();
-		for (int i = 0; i < shape_vertices.size(); i += 3)
-		{
-			shape_colors.push_back(r);
-			shape_colors.push_back(g);
-			shape_colors.push_back(b);
-		}
-		shape_colors.shrink_to_fit(); // Good idea after a bunch of pushes.
+		ColorShape(r, g, b);
+		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors[0]) * shape_colors.size(), &shape_colors.front(), GL_STATIC_DRAW);
 	}
-	void CalcAverageNormals(vector<GLshort>& indices, unsigned indiceCount, vector<GLfloat>& vertices,
-		unsigned verticeCount)
+	void DrawShape(GLchar c)
+	{
+		glBindVertexArray(vao);
+		glDrawElements(c, this->NumIndices(), GL_UNSIGNED_SHORT, 0);
+		glBindVertexArray(0);
+	}
+	void CalcAverageNormals(vector<GLshort>& indices, unsigned indiceCount, vector<GLfloat>& vertices, unsigned verticeCount)
 	{
 		// Popular shape_normals so we can use [].
 		for (int i = 0; i < verticeCount; i++)
@@ -100,6 +117,20 @@ struct Shape
 			shape_normals[i] = vec.x; shape_normals[i + 1] = vec.y; shape_normals[i + 2] = vec.z;
 		}
 	}
+
+protected:
+	void ColorShape(GLfloat r, GLfloat g, GLfloat b)
+	{
+		shape_colors.clear();
+		shape_colors.shrink_to_fit();
+		for (int i = 0; i < shape_vertices.size(); i += 3)
+		{
+			shape_colors.push_back(r);
+			shape_colors.push_back(g);
+			shape_colors.push_back(b);
+		}
+		shape_colors.shrink_to_fit(); // Good idea after a bunch of pushes.
+	}
 };
 
 struct Plane : public Shape // Vertical plane of 1x1 units across.
@@ -122,6 +153,7 @@ struct Plane : public Shape // Vertical plane of 1x1 units across.
 			shape_uvs.push_back(shape_vertices[i + 1]);
 		}
 		ColorShape(1.0f, 1.0f, 1.0f);
+		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
 	}
 };
 
@@ -173,60 +205,101 @@ struct Grid : public Shape // Flat grid on ground. Starts at 0,0,0 and increases
 		}
 		for (int i = 0; i < shape_vertices.size(); i += 3)
 		{
-			shape_uvs.push_back(0); // No texture for grid so value doesn't matter.
+			shape_uvs.push_back(0); // No texture, so value doesn't matter.
 			shape_uvs.push_back(0);
 		}
 		ColorShape(1.0f, 0.0f, 1.0f);
 		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
-
 	}
 };
 struct Cube : public Shape
 {
 	Cube()
 	{
-		// Normal cube, no cloned vertices:
 		shape_indices = {
 			// Front.
 			0, 1, 2,
 			2, 3, 0,
-			// Left.
-			4, 0, 3,
-			3, 7, 4,
-			// Bottom.
-			5, 1, 0,
-			0, 4, 5,
 			// Right.
-			6, 2, 1,
-			1, 5, 6,
+			4, 5, 6,
+			6, 7, 4,
 			// Back.
-			7, 6, 5,
-			5, 4, 7,
+			8, 9, 10,
+			10, 11, 8,
+			// Left.
+			12, 13, 14,
+			14, 15, 12,
 			// Top.
-			3, 2, 6,
-			6, 7, 3
+			16, 17, 18,
+			18, 19, 16,
+			// Bottom.
+			20, 21, 22,
+			22, 23, 20
 		};
 		shape_vertices = {
+			// Front.
 			0.0f, 0.0f, 1.0f,		// 0.
 			1.0f, 0.0f, 1.0f,		// 1.
 			1.0f, 1.0f, 1.0f,		// 2.
 			0.0f, 1.0f, 1.0f,		// 3.
-			0.0f, 0.0f, 0.0f,		// 4.
-			1.0f, 0.0f, 0.0f,		// 5.
-			1.0f, 1.0f, 0.0f,		// 6.
-			0.0f, 1.0f, 0.0f,		// 7.
+			// Right.
+			1.0f, 0.0f, 1.0f,		// 1. 4
+			1.0f, 0.0f, 0.0f,		// 5. 5
+			1.0f, 1.0f, 0.0f,		// 6. 6
+			1.0f, 1.0f, 1.0f,		// 2. 7
+			// Back.
+			1.0f, 0.0f, 0.0f,		// 5. 8
+			0.0f, 0.0f, 0.0f,		// 4. 9
+			0.0f, 1.0f, 0.0f,		// 7. 10
+			1.0f, 1.0f, 0.0f,		// 6. 11
+			// Left.
+			0.0f, 0.0f, 0.0f,		// 4. 12
+			0.0f, 0.0f, 1.0f,		// 0. 13
+			0.0f, 1.0f, 1.0f,		// 3. 14
+			0.0f, 1.0f, 0.0f,		// 7. 15
+			// Top.
+			0.0f, 1.0f, 0.0f,		// 7. 16
+			0.0f, 1.0f, 1.0f,		// 3. 17
+			1.0f, 1.0f, 1.0f,		// 2. 18
+			1.0f, 1.0f, 0.0f,		// 6. 19
+			// Bottom.
+			0.0f, 0.0f, 0.0f,		// 4. 20
+			1.0f, 0.0f, 0.0f,		// 5. 21
+			1.0f, 0.0f, 1.0f,		// 1. 22
+			0.0f, 0.0f, 1.0f		// 0. 23
 		};
 		shape_uvs = {
-			0.0f, 0.0f,		// 0.
-			3.0f, 0.0f,		// 1.
-			3.0f, 1.0f,		// 2.
+			// Front.
+			0.0f, 0.0f, 	// 0.
+			1.0f, 0.0f, 	// 1.
+			1.0f, 1.0f, 	// 2.
 			0.0f, 1.0f,		// 3.
-			3.0f, 0.0f,		// 4.
-			0.0f, 0.0f,		// 5.
+			// Right.
+			0.0f, 0.0f, 	// 1.
+			1.0f, 0.0f, 	// 5.
+			1.0f, 1.0f, 	// 6.
+			0.0f, 1.0f,		// 2.
+			// Back.
+			0.0f, 0.0f, 	// 5.
+			1.0f, 0.0f, 	// 4.
+			1.0f, 1.0f,		// 7.
 			0.0f, 1.0f,		// 6.
-			3.0f, 1.0f		// 7.
+			// Left.
+			0.0f, 0.0f,		// 4.
+			1.0f, 0.0f,		// 0.
+			1.0f, 1.0f,		// 3.
+			0.0f, 1.0f,		// 7.
+			// Top.
+			0.0f, 0.0f,		// 7.
+			1.0f, 0.0f,		// 3.
+			1.0f, 1.0f,		// 2.
+			0.0f, 1.0f,		// 6.
+			// Bottom.
+			0.0f, 0.0f,		// 4.
+			1.0f, 0.0f,		// 5.
+			1.0f, 1.0f,		// 1.
+			0.0f, 1.0f		// 0.
 		};
-
 		ColorShape(1.0f, 1.0f, 1.0f);
 		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
 	}
@@ -300,7 +373,7 @@ struct Prism : public Shape
 		shape_indices.push_back(sides);
 		for (int i = 0; i < shape_vertices.size(); i += 3)
 		{
-			shape_uvs.push_back(0); // No texture for grid so value doesn't matter.
+			shape_uvs.push_back(0); // No texture, so value doesn't matter.
 			shape_uvs.push_back(0);
 		}
 		ColorShape(1.0f, 1.0f, 1.0f);
@@ -347,6 +420,12 @@ struct Cone : public Shape
 		shape_indices.push_back(sides);
 		shape_indices.push_back(sides + 1);
 		shape_indices.push_back(1);
+		for (int i = 0; i < shape_vertices.size(); i += 3)
+		{
+			shape_uvs.push_back(0); // No texture, so value doesn't matter.
+			shape_uvs.push_back(0);
+		}
 		ColorShape(1.0f, 1.0f, 1.0f);
+		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
 	}
 };
