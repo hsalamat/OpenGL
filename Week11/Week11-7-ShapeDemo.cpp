@@ -66,7 +66,7 @@ GLfloat ambientStrength = 0.1f;
 
 glm::vec3 dirColour = glm::vec3(1.0f, 1.0f, 1.0f);
 GLfloat dirStrength = 1.0f;
-glm::vec3 lightDirection = glm::vec3(0.0f, 0.0f, 1.0f); // More like lightOrigin.
+glm::vec3 lightDirection = glm::vec3(0.0f, 1.0f, 1.0f); // More like lightOrigin.
 
 void timer(int);
 
