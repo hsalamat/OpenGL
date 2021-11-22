@@ -181,26 +181,10 @@ void setupShaders()
 
 void setupVAO()
 {
-	vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	ibo = 0;
-	glGenBuffers(1, &ibo);
-
-	points_vbo = 0;
-	glGenBuffers(1, &points_vbo);
-
-	colors_vbo = 0;
-	glGenBuffers(1, &colors_vbo);
-
-	uv_vbo = 0;
-	glGenBuffers(1, &uv_vbo);
-
-	normals_vbo = 0;
-	glGenBuffers(1, &normals_vbo);
-
-	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+	// All VAO/VBO data now in Shape.h! But we still need to do this AFTER OpenGL is initialized.
+	g_grid.BufferShape();
+	g_cube.BufferShape();
+	g_prism.BufferShape();
 }
 
 void init(void)
@@ -281,23 +265,20 @@ void display(void)
 	// Draw all shapes.
 
 	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	g_grid.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(15.0f, -5.0f, 30.0f));
-	glDrawElements(GL_LINE_STRIP, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	g_grid.DrawShape(GL_LINE_STRIP);
 
 	angle += -2.0;
 
 	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(0.0f, 2.0f, 2.0f));
-	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	g_cube.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, metalTexture);
-	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(0.0f, 1.0f, 2.0f));
-	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	g_prism.DrawShape(GL_TRIANGLES);
 
-	glBindVertexArray(0); // Done writing.
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glutSwapBuffers(); // Now for a potentially smoother render.
 }
 
