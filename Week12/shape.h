@@ -314,23 +314,31 @@ struct Prism : public Shape
 		shape_vertices.push_back(0.5f);
 		shape_vertices.push_back(1.0f);
 		shape_vertices.push_back(0.5f);
+		shape_uvs.push_back(0); 
+		shape_uvs.push_back(0);
 		for (int i = 0; i < sides; ++i)
 		{
 			shape_vertices.push_back(0.5f + 0.5f * cos(theta));
 			shape_vertices.push_back(1.0f);
 			shape_vertices.push_back(0.5f + 0.5f * sin(theta));
 			theta += 2 * PI / sides;
+			shape_uvs.push_back(0);
+			shape_uvs.push_back(1);
 		}
 		// Bottom face.
 		shape_vertices.push_back(0.5f);
 		shape_vertices.push_back(0.0f);
 		shape_vertices.push_back(0.5f);
+		shape_uvs.push_back(0);
+		shape_uvs.push_back(0);
 		for (int i = 0; i < sides; ++i)
 		{
 			shape_vertices.push_back(0.5f + 0.5f * cos(theta));
 			shape_vertices.push_back(0.0f);
 			shape_vertices.push_back(0.5f + 0.5f * sin(theta));
 			theta += 2 * PI / sides;
+			shape_uvs.push_back(1);
+			shape_uvs.push_back(0);
 		}
 		// Indices now.
 		// Bottom face.
@@ -373,8 +381,8 @@ struct Prism : public Shape
 		shape_indices.push_back(sides);
 		for (int i = 0; i < shape_vertices.size(); i += 3)
 		{
-			shape_uvs.push_back(0); // No texture, so value doesn't matter.
-			shape_uvs.push_back(0);
+			//shape_uvs.push_back(0); // No texture, so value doesn't matter.
+			//shape_uvs.push_back(0);
 		}
 		ColorShape(1.0f, 1.0f, 1.0f);
 		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());

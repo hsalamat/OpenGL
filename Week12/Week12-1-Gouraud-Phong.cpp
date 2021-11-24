@@ -63,7 +63,7 @@ glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f,1.0f);
 glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-GLfloat materialShininess = 20.0;
+GLfloat materialShininess = 5.0;
 
 
 
@@ -331,6 +331,14 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case '+':
+		materialShininess++;
+		cout << "materialShininess: " << materialShininess <<endl;
+		break;
+	case '-':
+		materialShininess--;
+		cout << "materialShininess: " << materialShininess << endl;
+		break;
 	case 'w':
 		osV -= scrollSpd;
 		break;

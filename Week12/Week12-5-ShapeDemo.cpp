@@ -120,7 +120,7 @@ void loadTexture()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image);
 
 	// Second texture. Blank one.
@@ -136,7 +136,7 @@ void loadTexture()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image2);
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
@@ -259,10 +259,12 @@ void display(void)
 	g_grid.DrawShape(GL_LINE_STRIP);
 
 	// Cube.
+	glBindTexture(GL_TEXTURE_2D, leafTexture);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(6.0f, 0.0f, 0.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
 
 	// Prism.
+	glBindTexture(GL_TEXTURE_2D, metalTexture);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 0.0f, 0.0f));
 	g_prism.DrawShape(GL_TRIANGLES);
 

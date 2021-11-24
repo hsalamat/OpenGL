@@ -46,11 +46,11 @@
     if (specular < 0.2) finalColor *= 0.8;
     else finalColor = color2;
 
-    if (specular > 0.2 && specular < 0.4) finalColor = materialDiffuse * 0.6;
+    if (specular > 0.2 && specular < 0.8) finalColor = materialDiffuse * 0.6;
 
     // Diffuse part
     float diffuse = max(dot(nN,-nL),0.0);
-    if (diffuse < 0.5) finalColor *=0.8;
+    if (diffuse < 0.3) finalColor *=0.8;
     }
 }
  

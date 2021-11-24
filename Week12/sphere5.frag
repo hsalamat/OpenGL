@@ -49,7 +49,7 @@ Id = lightDiffuse* materialDiffuse * lambertTerm; //add diffuse term
 
 //vec3 R = reflect(nL, nN);
 //float specular = pow(max(dot(R, nE), 0.0), shininess );
-float specular = pow(max(dot(H, nN), 0.0), shininess );
+float specular = pow(max(dot(H, nN), 0.0),  max(shininess,2.0) );
 
 Is = lightSpecular * materialSpecular * specular; //add specular term
 }

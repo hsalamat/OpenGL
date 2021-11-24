@@ -60,7 +60,7 @@ void main()
  vec3 eyeVec = -vec3(pos);
  vec3 E = normalize(eyeVec);
  vec3 R = reflect(L, N);
- float specular = pow(max(dot(R, E), 0.0), shininess );
+ float specular = pow(max(dot(R, E), 0.0), max(shininess,1.0) );
 
  Is = lightSpecular * materialSpecular * specular; //add specular term
  }

@@ -331,6 +331,14 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case '+':
+		materialShininess++;
+		cout << "materialShininess: " << materialShininess << endl;
+		break;
+	case '-':
+		materialShininess--;
+		cout << "materialShininess: " << materialShininess << endl;
+		break;
 	case 'w':
 		osV -= scrollSpd;
 		break;
