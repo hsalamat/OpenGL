@@ -61,10 +61,10 @@ GLuint metalTexture, leafTexture;
 GLint width, height, bitDepth;
 
 // Light variables.
-glm::vec3 ambientColour = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 ambientcolor = glm::vec3(1.0f, 1.0f, 1.0f);
 GLfloat ambientStrength = 0.1f;
 
-glm::vec3 dirColour = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 dircolor = glm::vec3(1.0f, 1.0f, 1.0f);
 GLfloat dirStrength = 1.0f;
 glm::vec3 lightDirection = glm::vec3(0.0f, 1.0f, 1.0f); // More like lightOrigin.
 
@@ -132,11 +132,11 @@ void loadTexture()
 void setupLight()
 {
 	// Setting ambient light.
-	glUniform3f(glGetUniformLocation(program, "ambientColour"), ambientColour.x, ambientColour.y, ambientColour.z);
+	glUniform3f(glGetUniformLocation(program, "ambientcolor"), ambientcolor.x, ambientcolor.y, ambientcolor.z);
 	glUniform1f(glGetUniformLocation(program, "ambientStrength"), ambientStrength);
 	// Setting directional light.
 	glUniform3f(glGetUniformLocation(program, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
-	glUniform3f(glGetUniformLocation(program, "dirColour"), dirColour.x, dirColour.y, dirColour.z);
+	glUniform3f(glGetUniformLocation(program, "dircolor"), dircolor.x, dircolor.y, dircolor.z);
 	glUniform1f(glGetUniformLocation(program, "dirStrength"), dirStrength);
 
 }
