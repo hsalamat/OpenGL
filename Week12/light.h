@@ -4,22 +4,22 @@
 
 struct Light
 {
-	glm::vec3 diffuseColour;
+	glm::vec3 diffusecolor;
 	GLfloat diffuseStrength;
 	Light(glm::vec3 dCol, GLfloat dStr)
 	{
-		diffuseColour = dCol;
+		diffusecolor = dCol;
 		diffuseStrength = dStr;
 	}
 };
 
 struct AmbientLight
 {
-	glm::vec3 ambientColour;
+	glm::vec3 ambientcolor;
 	GLfloat ambientStrength;
 	AmbientLight(glm::vec3 aCol, GLfloat aStr)
 	{
-		ambientColour = aCol;
+		ambientcolor = aCol;
 		ambientStrength = aStr;
 	}
 };

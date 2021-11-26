@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 #define PI 3.14159265358979324
 using namespace std;
 
@@ -131,6 +132,105 @@ protected:
 		}
 		shape_colors.shrink_to_fit(); // Good idea after a bunch of pushes.
 	}
+};
+
+
+
+struct Sphere : public Shape
+{
+
+	Sphere(int subdivision)
+	{
+
+		const int Ndivisions = subdivision;
+		const int NumTetrahedrons = pow(4.0, subdivision); // example: 4^5 = 1024 tetrahedrons      
+		const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
+		const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
+
+		glm::vec3 v[4];
+		v[0] = glm::vec3(0.0, 0.0, -1.0);
+		v[1] = glm::vec3(0.0, 0.942809, 0.333333);
+		v[2] = glm::vec3(-0.816497, -0.471405, 0.333333);
+		v[3] = glm::vec3(0.816497, -0.471405, 0.333333);
+
+
+		tetra(v[0], v[1], v[2], v[3], Ndivisions);
+		int j = 0;
+
+		for (int i = 0; i < NumVertices; ++i) {
+			shape_indices.push_back(i);
+		}
+
+		for (int i = 0; i < shape_vertices.size(); i ++)
+		{
+			shape_uvs.push_back(0); 
+			shape_uvs.push_back(0);
+			shape_uvs.push_back(0);
+			shape_uvs.push_back(1);
+			shape_uvs.push_back(1);
+			shape_uvs.push_back(0);
+		}
+		
+		ColorShape(1.0f, 1.0f, 0.0f);
+	}
+
+	void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
+		/* specify one triangle */
+	{
+
+		shape_vertices.push_back(a[0]);
+		shape_vertices.push_back(a[1]);
+		shape_vertices.push_back(a[2]);
+
+		shape_normals.push_back(a[0]);
+		shape_normals.push_back(a[1]);
+		shape_normals.push_back(a[2]);
+		shape_normals.push_back(0.0);
+
+		shape_vertices.push_back(b[0]);
+		shape_vertices.push_back(b[1]);
+		shape_vertices.push_back(b[2]);
+
+		shape_normals.push_back(b[0]);
+		shape_normals.push_back(b[1]);
+		shape_normals.push_back(b[2]);
+		shape_normals.push_back(0.0);
+
+		shape_vertices.push_back(c[0]);
+		shape_vertices.push_back(c[1]);
+		shape_vertices.push_back(c[2]);
+
+		shape_normals.push_back(c[0]);
+		shape_normals.push_back(c[1]);
+		shape_normals.push_back(c[2]);
+		shape_normals.push_back(0.0);
+	}
+
+	void divide_triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, int k)
+	{
+		if (k > 0)
+		{
+			// compute midpoints of sides
+			glm::vec3 ab = glm::normalize((a + b) / 2.0f);
+			glm::vec3 ac = glm::normalize((a + c) / 2.0f);
+			glm::vec3 bc = glm::normalize((b + c) / 2.0f);
+			// subdivide all but inner triangle
+			divide_triangle(a, ab, ac, k - 1);
+			divide_triangle(ab, b, bc, k - 1);
+			divide_triangle(bc, c, ac, k - 1);
+			divide_triangle(ab, bc, ac, k - 1);
+		}
+		else triangle(a, b, c); /* draw triangle at end of recursion */
+	}
+
+	void tetra(glm::vec3& a, glm::vec3& b, glm::vec3& c, glm::vec3& d, int n)
+	{
+		divide_triangle(a, b, c, n);
+		divide_triangle(a, c, d, n);
+		divide_triangle(a, d, b, n);
+		divide_triangle(b, d, c, n);
+	}
+
 };
 
 struct Plane : public Shape // Vertical plane of 1x1 units across.

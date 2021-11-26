@@ -67,11 +67,11 @@ GLuint metalTexture, leafTexture;
 GLint width, height, bitDepth;
 
 // Light variables.
-AmbientLight aLight(glm::vec3(1.0f, 1.0f, 0.0f),	// Ambient colour.
+AmbientLight aLight(glm::vec3(1.0f, 1.0f, 0.0f),	// Ambient color.
 	0.1f);							// Ambient strength.
 
 DirectionalLight dLight(glm::vec3(0.0f, 1.0f, 1.0f), // Direction.
-	glm::vec3(1.0f, 1.0f, 0.5f),  // Diffuse colour.
+	glm::vec3(1.0f, 1.0f, 0.5f),  // Diffuse color.
 	0.8f);		// Diffuse strength.
 
 Material mat = { 2.0f, 2 }; 
@@ -79,7 +79,7 @@ Material mat = { 2.0f, 2 };
 //we use this later
 //PointLight pLight(glm::vec3(5.0f, 1.0f, -2.0f),	// Position.
 //	1.0f, 0.7f, 1.8f,				// Constant, Linear, Exponent.
-//	glm::vec3(1.0f, 0.0f, 0.0f),	// Diffuse colour.
+//	glm::vec3(1.0f, 0.0f, 0.0f),	// Diffuse color.
 //	1.0f);						// Diffuse strength.
 //
 
@@ -100,6 +100,7 @@ void resetView()
 Grid g_grid(48);
 Cube g_cube;
 Prism g_prism(24);
+Sphere g_sphere(6);
 
 static unsigned int
 program,
@@ -123,7 +124,7 @@ void loadTexture()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image);
 
 	// Second texture. Blank one.
@@ -139,7 +140,7 @@ void loadTexture()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image2);
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
@@ -148,11 +149,11 @@ void loadTexture()
 void setupLight()
 {
 	// Setting ambient Light.
-	glUniform3f(glGetUniformLocation(program, "aLight.ambientColour"), aLight.ambientColour.x, aLight.ambientColour.y, aLight.ambientColour.z);
+	glUniform3f(glGetUniformLocation(program, "aLight.ambientcolor"), aLight.ambientcolor.x, aLight.ambientcolor.y, aLight.ambientcolor.z);
 	glUniform1f(glGetUniformLocation(program, "aLight.ambientStrength"), aLight.ambientStrength);
 
 	// Setting directional light.
-	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColour"), dLight.diffuseColour.x, dLight.diffuseColour.y, dLight.diffuseColour.z);
+	glUniform3f(glGetUniformLocation(program, "dLight.base.diffusecolor"), dLight.diffusecolor.x, dLight.diffusecolor.y, dLight.diffusecolor.z);
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
 
 	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
@@ -185,6 +186,7 @@ void setupVAO()
 	g_grid.BufferShape();
 	g_cube.BufferShape();
 	g_prism.BufferShape();
+	g_sphere.BufferShape();
 }
 
 void init(void)
@@ -270,12 +272,17 @@ void display(void)
 
 	angle += -2.0;
 
+	angle += -2.0;
+	//Sphere.
+	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, angle, glm::vec3(6.0f, 2.0f, 0.0f));
+	g_sphere.DrawShape(GL_TRIANGLES);
+
 	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(0.0f, 2.0f, 2.0f));
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(0.0f, 2.0f, 2.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, metalTexture);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, angle, glm::vec3(0.0f, 1.0f, 2.0f));
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(0.0f, 1.0f, 2.0f));
 	g_prism.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
