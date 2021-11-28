@@ -4,7 +4,8 @@
  *  @note press WASD for tracking the camera or zooming in and out
  *  @note press arrow keys and page up and page down to move the light
  *  @note move mouse to yaw and pitch
- *  @attention we are using point vertex and point fragment shaders!
+ *  @attention we are using point vertex and point2 fragment shaders!
+ *  𝑨𝒕𝒕(𝒅) = 𝒔𝒂𝒕𝒖𝒓𝒂𝒕𝒆((𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅−𝒅)/(𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑬𝒏𝒅 − 𝒇𝒂𝒍𝒍𝒐𝒇𝒇𝑺𝒕𝒂𝒓𝒕))
  *  @author Hooman Salamat
  *  @bug No known bugs.
  */
@@ -178,7 +179,7 @@ void setupShaders()
 {
 	// Create shader program executable.
 	vertexShaderId = setShader((char*)"vertex", (char*)"point.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"point.frag");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"point2.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -231,7 +232,7 @@ void init(void)
 	setupLights();
 
 	setupVAOs();
-
+	
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -290,7 +291,7 @@ void display(void)
 	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	gridTexture->Bind(GL_TEXTURE0);
 
 	// Grid. Note: I rendered it solid!

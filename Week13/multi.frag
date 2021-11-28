@@ -4,28 +4,27 @@
     #define NUM_POINT_LIGHTS 2
 #endif
 
-in vec3 colour;
+in vec3 color;
 in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
-out vec4 frag_colour;
+out vec4 frag_color;
 
 struct Light
 {
-	vec3 diffuseColour;
+	vec3 diffuseColor;
 	float diffuseStrength;
 };
 
-struct AmbientLight
+struct AmbientLight 
 {
-	vec3 ambientColour;
-	float ambientStrength;
+	Light base;
 };
 
 struct DirectionalLight 
 {
 	Light base;
-	vec3 direction;
+	vec3 origin;
 };
 
 struct PointLight
@@ -34,7 +33,7 @@ struct PointLight
 	vec3 position;
 	float constant;
 	float linear;
-	float exponent;
+	float quadratic;
 };
 
 struct SpotLight
@@ -51,6 +50,7 @@ struct Material
 	float shininess;
 };
 
+
 uniform sampler2D texture0;
 
 uniform vec3 eyePosition;
@@ -61,10 +61,16 @@ uniform PointLight pLights[NUM_POINT_LIGHTS];
 uniform SpotLight sLight;
 uniform Material mat;
 
+vec4 calcAmbientLight(Light a)
+{
+	vec4 ambient = vec4(a.diffuseColor, 1.0f) * a.diffuseStrength;
+	return ambient;
+}
+
 vec4 calcLightByDirection(Light l, vec3 dir)
 {
-	float diffuseFactor = max(dot(normalize(normal),normalize(dir)), 0.0f); // Lambert's Cosine Law.
-	vec4 diffuse = vec4(l.diffuseColour, 1.0f) * l.diffuseStrength * diffuseFactor;
+	float diffuseFactor = max( dot( normalize(normal), normalize(dir) ), 0.0f);
+	vec4 diffuse = vec4(l.diffuseColor, 1.0f) * l.diffuseStrength * diffuseFactor;
 
 	vec4 specular = vec4(0,0,0,0);
 	if (diffuseFactor > 0.0f && l.diffuseStrength > 0.0f)
@@ -76,7 +82,7 @@ vec4 calcLightByDirection(Light l, vec3 dir)
 		if (specularFactor > 0.0f)
 		{
 			specularFactor = pow(specularFactor, mat.shininess);
-			specular = vec4(l.diffuseColour * mat.specularStrength * specularFactor, 1.0f);
+			specular = vec4(l.diffuseColor * mat.specularStrength * specularFactor, 1.0f);
 		}
 	}
 	return (diffuse + specular);
@@ -84,7 +90,7 @@ vec4 calcLightByDirection(Light l, vec3 dir)
 
 vec4 calcDirectionalLight()
 {
-	return calcLightByDirection(dLight.base, dLight.direction);
+	return calcLightByDirection(dLight.base, dLight.origin);
 }
 
 vec4 calcPointLight(PointLight p)
@@ -93,40 +99,41 @@ vec4 calcPointLight(PointLight p)
 	float distance = length(direction);
 	direction = normalize(direction);
 		
-	vec4 colour = calcLightByDirection(p.base, direction);
-	float attenuation = p.exponent * distance * distance +
+	vec4 color = calcLightByDirection(p.base, direction);
+	float attenuation = p.quadratic * distance * distance +
 						p.linear * distance +
 						p.constant;
 
-	return (colour / attenuation);
+	return (color / attenuation);
 }
 
 vec4 calcSpotLight(SpotLight s)
 {
-	vec4 colour = vec4(0,0,0,0);
+	vec4 color = vec4(0,0,0,0);
 	vec3 rayDirection = normalize(fragPos - s.position);
 	float slFactor = dot(rayDirection, s.direction);
-	if (slFactor > s.edge)
+	if (slFactor > s.edge) //inside the cone?
 	{
 		vec3 direction = fragPos - s.position;
 		float distance = length(direction);
 		direction = normalize(direction);
-		colour = calcLightByDirection(s.base, direction);
-		colour *= (1.0f - (1.0f - slFactor) * (1.0f / (1.0f - s.edge)));
+		color = calcLightByDirection(s.base, direction);
+		color *= (1.0f - (1.0f - slFactor) * (1.0f / (1.0f - s.edge)));
 	}
-	return colour;
+	return color;
 }
 
 void main()
 {
-	vec4 calcColour = vec4(0,0,0,0);
+	vec4 calcColor = vec4(0,0,0,0);
 	
-	vec4 ambient = vec4(aLight.ambientColour, 1.0f) * aLight.ambientStrength;
-	calcColour += ambient;
-	calcColour += calcDirectionalLight();
+	calcColor += calcAmbientLight(aLight.base);
+	calcColor += calcDirectionalLight();
 	for (int i = 0; i < NUM_POINT_LIGHTS; i++)
-		calcColour += calcPointLight(pLights[i]);
-	calcColour += calcSpotLight(sLight);
+		calcColor += calcPointLight(pLights[i]);
+	calcColor += calcSpotLight(sLight);
 	
-	frag_colour = texture(texture0, texCoord) * vec4(colour, 1.0f) * calcColour;
+	frag_color = texture(texture0, texCoord) * vec4(color, 1.0f) * calcColor;
+	//easy way to debug your fragment shader
+	//frag_color = calcColor;
 }

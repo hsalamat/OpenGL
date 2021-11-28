@@ -1,64 +1,64 @@
 #pragma once
 
-#include "glm\glm.hpp"
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
-struct Diffuse
+using namespace std;
+
+struct Light
 {
-	glm::vec4 light;
-	glm::vec4 material;
-	Diffuse(glm::vec4 dLight, glm::vec4 dMaterial)
+	glm::vec3 diffuseColor;
+	GLfloat diffuseStrength;
+	Light(glm::vec3 dCol, GLfloat dStr)
 	{
-		light = dLight;
-		material = dMaterial;
-	}
-};
-//old light
-struct Ambient
-{
-	glm::vec4 light;
-	glm::vec4 material;
-	Ambient(glm::vec4 aLight, glm::vec4 aMaterial)
-	{
-		light = aLight;
-		material = aMaterial;
+		diffuseColor = dCol;
+		diffuseStrength = dStr;
 	}
 };
 
-struct Specular
+struct AmbientLight : public Light
 {
-	glm::vec4 light;
-	glm::vec4 material;
-	GLfloat shininess;
-	Specular(glm::vec4 sLight, glm::vec4 sMaterial, GLfloat sShininess)
-	{
-		light = sLight;
-		material = sMaterial;
-		shininess = sShininess;
-	}
+	AmbientLight(glm::vec3 aCol, GLfloat aStr) : Light(aCol, aStr) {}
 };
 
-
-struct DirectionalLight : public Diffuse
+struct DirectionalLight : public Light
 {
-	glm::vec3 direction;
-	DirectionalLight(glm::vec3 dir, glm::vec4 dLight, glm::vec4 dMaterial)
-		: Diffuse(dLight, dMaterial)
-	{
-		direction = dir;
-	}
+	glm::vec3 origin;
+	DirectionalLight(glm::vec3 ori, glm::vec3 dCol, GLfloat dStr)
+		: Light(dCol, dStr), origin(ori) { }
 };
 
-struct PointLight : public Diffuse
+struct PointLight : public Light
 {
-	glm::vec3 position; 
-	GLfloat constant, linear, exponent;
-	PointLight(glm::vec3 pos, GLfloat con, GLfloat lin, GLfloat exp,
-		glm::vec4 dLight, glm::vec4 dMaterial) : Diffuse(dLight, dMaterial)
+	glm::vec3 position; //= glm::vec3(0.0f, 0.0f, 0.0f);
+	GLfloat constant, linear, quadratic;
+	PointLight(glm::vec3 pos, GLfloat range, GLfloat con, GLfloat lin, GLfloat quad,
+		glm::vec3 dCol, GLfloat dStr) : Light(dCol, dStr)
 	{
 		position = pos;
-		constant = con;
-		linear = lin;
-		exponent = exp;
+		constant = con; //= 1.0f
+		linear = lin / range; //= 4.5f / range;
+		quadratic = quad / (range * range); //= 75.0f / (range * range);
 	}
+};
+
+struct SpotLight : public Light
+{
+	glm::vec3 position;
+	glm::vec3 direction;
+	GLfloat edge, edgeRad;
+	SpotLight(glm::vec3 pos, glm::vec3 dCol, GLfloat dStr, glm::vec3 dir,
+		GLfloat e) : Light(dCol, dStr)
+	{
+		position = pos;
+		direction = dir;
+		edge = e;
+		edgeRad = cosf(glm::radians(edge));
+	}
+};
+
+struct Material
+{
+	GLfloat specularStrength;
+	GLfloat shininess;
 };

@@ -1,388 +1,499 @@
-///////////////////////////////////////////////////////////////////////
-//Directional Light
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+﻿
+/** @file Week13-1-DirectionalLightDemo.cpp
+ *  @brief Using Shape.h + Light.h + Texture.h
+ *  @note press WASD for tracking the camera or zooming in and out
+ *  @note press arrow keys and page up and page down to move the light
+ *  @note move mouse to yaw and pitch
+ *  @attention we are using directional vertex and fragment shaders!
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
+using namespace std;
 
-#include <iostream>
 #include "stdlib.h"
 #include "time.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
 #include "prepShader.h"
-#include "glm\glm.hpp"
-#include "glm\gtc\matrix_transform.hpp"
-#include <array>
-#include "light.h"
-using namespace std;
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include <iostream>
+#include "Shape.h"
+#include "Light.h"
+#include "Texture.h"
 
+#define BUFFER_OFFSET(x)  ((const void*) (x))
+#define FPS 60
+#define MOVESPEED 0.1f
+#define TURNSPEED 0.05f
 #define X_AXIS glm::vec3(1,0,0)
 #define Y_AXIS glm::vec3(0,1,0)
 #define Z_AXIS glm::vec3(0,0,1)
-#define XY_AXIS glm::vec3(1,1,0)
+#define XY_AXIS glm::vec3(1,0.9,0)
 #define YZ_AXIS glm::vec3(0,1,1)
 #define XZ_AXIS glm::vec3(1,0,1)
+#define SPEED 0.25f
 
-GLuint vao, ibo, points_vbo, colors_vbo, normals_vbo, projectionID, normalID, modelID, viewID;
-float rotAngle = 0.0f;
-int deltaTime, currentTime, lastTime = 0;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-// Horizontal and vertical ortho offsets.
-float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
+enum keyMasks {
+	KEY_FORWARD = 0b00000001,		// 0x01 or   1	or   01
+	KEY_BACKWARD = 0b00000010,		// 0x02 or   2	or   02
+	KEY_LEFT = 0b00000100,
+	KEY_RIGHT = 0b00001000,
+	KEY_UP = 0b00010000,
+	KEY_DOWN = 0b00100000,
+	KEY_MOUSECLICKED = 0b01000000
 
-glm::mat4 mv, view, projection;
-
-const int Ndivisions = 5;
-const int NumTetrahedrons = 1024; // 4^5 tetrahedrons      
-const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
-const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
-
-std::array<glm::vec3, NumVertices> vertices1;
-GLfloat vertices[NumVertices][3] = { 0 };
-glm::vec3 v[4];
-
-std::array<glm::vec3, NumVertices> colors1;
-GLfloat colors[NumVertices][3] = { 0 };
-glm::vec3 c[3] = { glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0),glm::vec3(0.0, 0.0, 1.0) };
-
-std::array<glm::vec3, NumVertices> normals1;
-GLfloat normals[NumVertices][4] = { 0 };
-
-int  Index = 0;
-int  colorIndex = 0;
-
-//glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
-
-//glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 0.0f);
-//glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-//glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
-//glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-//glm::vec4 materialAmbient = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-//glm::vec4 materialDiffuse = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
-//glm::vec4 materialSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-//GLfloat materialShininess = 40.0;
-
-// Light variables.
-Ambient aLight(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
-
-Specular sLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 40.0);
-
-DirectionalLight dLight(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0), glm::vec4(1.0f, 0.8f, 0.0f, 1.0f));
-
+	// Any other keys you want to add.
+};
 
 static unsigned int
 program,
 vertexShaderId,
 fragmentShaderId;
 
+GLuint modelID, viewID, projID;
+glm::mat4 View, Projection;
 
-glm::vec3 calculateNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
-	glm::vec3 normal;
-	glm::vec3 aVector = c - a;
-	glm::vec3 bVector = b - a;
-	glm::vec3 normalVector = glm::cross(aVector, bVector);
-	glm::vec3 normalized = glm::normalize(normalVector);
-	normal[0] = normalized[0];
-	normal[1] = normalized[1];
-	normal[2] = normalized[2];
-	return normal;
+// Our bitflag variable. 1 byte for up to 8 key states.
+unsigned char keys = 0; // Initialized to 0 or 0b00000000.
+
+// Texture variables.
+GLuint blankID;
+GLint width, height, bitDepth;
+
+
+//lightposition (this is the sphere's position!)
+glm::vec3 directionalLightPosition = glm::vec3(8.0f, 10.0f, 0.0f);
+
+// Light objects. Now OOP.
+AmbientLight aLight(
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
+	0.1f);							// Diffuse strength.
+
+DirectionalLight dLight(
+	//glm::vec3(0.0f, 10.0f, 0.0f),	// Origin.
+	directionalLightPosition,
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
+	1.0f);							// Diffuse strength.
+
+Material mat = { 0.5f, 8 }; // Alternate way to construct an object.
+
+// Camera and transform variables.
+float scale = 1.0f, angle = 0.0f;
+glm::vec3 position, frontVec, worldUp, upVec, rightVec; // Set by function
+GLfloat pitch, yaw;
+int lastX, lastY;
+
+// Geometry data.
+Grid g_grid(16);
+Cube g_cube;
+Prism g_prism(7);
+Sphere g_sphere(5);
+
+void timer(int); // Prototype.
+
+Texture* pTexture = NULL;
+GLuint textureID;
+
+void resetView()
+{
+	position = glm::vec3(8.0f, 5.0f, 20.0f); 
+	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
+	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	pitch = 0.0f;
+	yaw = -90.0f;
 }
 
-void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
-/* specify one triangle */
-{
 
-	int i = colorIndex++ % 4;
-	glm::vec3 tColor = glm::vec3(0.0, 0.0, 0.0);
-	switch (i)
-	{
-	case 0:
-		tColor = glm::vec3(1.0, 0.0, 0.0);
-		break;
-	case 1:
-		tColor = glm::vec3(0.0, 1.0, 0.0);
-		break;
-	case 2:
-		tColor = glm::vec3(0.0, 0.0, 1.0);
-		break;
-	case 3:
-		tColor = glm::vec3(1.0, 0.0, 1.0);
-		break;
-	default:
-		tColor = glm::vec3(0.0, 0.0, 0.0);
+void loadTexture()
+{
+	//// Image loading.
+	//stbi_set_flip_vertically_on_load(true);
+
+	//// Load first image.
+	//unsigned char* image = stbi_load("Media/blank.jpg", &width, &height, &bitDepth, 0);
+	//if (!image) { cout << "Unable to load file!" << endl; }
+	//glGenTextures(1, &blankID);
+	//glBindTexture(GL_TEXTURE_2D, blankID);
+	//// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	//stbi_image_free(image);
+	//// End first image.
+
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	pTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
+	pTexture->Bind(GL_TEXTURE0);
+	if (!pTexture->Load()) {
+		exit(0);
 	}
 
-
-	glm::vec3 qNormal = calculateNormal(a, b, c);
-	normals1[Index] = qNormal;
-	colors1[Index] = tColor;
-	vertices1[Index++] = a;
-
-	normals1[Index] = qNormal;
-	colors1[Index] = tColor;
-	vertices1[Index++] = b;
-
-	normals1[Index] = qNormal;
-	colors1[Index] = tColor;
-	vertices1[Index++] = c;
 }
 
-
-void divide_triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, int k)
+void setupLights()
 {
-	if (k > 0)
-	{
-		// compute midpoints of sides
-		glm::vec3 ab = glm::normalize((a + b) / 2.0f);
-		glm::vec3 ac = glm::normalize((a + c) / 2.0f);
-		glm::vec3 bc = glm::normalize((b + c) / 2.0f);
-		// subdivide all but inner triangle
-		divide_triangle(a, ab, ac, k - 1);
-		divide_triangle(ab, b, bc, k - 1);
-		divide_triangle(bc, c, ac, k - 1);
-		divide_triangle(ab, bc, ac, k - 1);
-	}
-	else triangle(a, b, c); /* draw triangle at end of recursion */
+	// Setting material values.
+	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), mat.specularStrength);
+	glUniform1f(glGetUniformLocation(program, "mat.shininess"), mat.shininess);
+
+	// Setting ambient light.
+	glUniform3f(glGetUniformLocation(program, "aLight.base.diffuseColor"), aLight.diffuseColor.x, aLight.diffuseColor.y, aLight.diffuseColor.z);
+	glUniform1f(glGetUniformLocation(program, "aLight.base.diffuseStrength"), aLight.diffuseStrength);
+
+	// Setting directional light.
+	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColor"), dLight.diffuseColor.x, dLight.diffuseColor.y, dLight.diffuseColor.z);
+	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "dLight.origin"), dLight.origin.x, dLight.origin.y, dLight.origin.z);
+
 }
 
-void tetra(glm::vec3& a, glm::vec3& b, glm::vec3& c, glm::vec3& d, int n)
+void setupVAOs()
 {
-	divide_triangle(a, b, c, n);
-	divide_triangle(a, c, d, n);
-	divide_triangle(a, d, b, n);
-	divide_triangle(b, d, c, n);
+	// All VAO/VBO data now in Shape.h! But we still need to do this AFTER OpenGL is initialized.
+	g_grid.BufferShape();
+	g_cube.BufferShape();
+	g_prism.BufferShape();
+	g_sphere.BufferShape();
 }
 
-void setupBuffers()
+void setupShaders()
 {
-	vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	points_vbo = 0;
-
-	glGenBuffers(1, &points_vbo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-
-	glBufferData(GL_ARRAY_BUFFER, 3 * NumVertices * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
-
-	colors_vbo = 0;
-	glGenBuffers(1, &colors_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3 * NumVertices * sizeof(GLfloat), colors, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(1);
-
-	normals_vbo = 0;
-	glGenBuffers(1, &normals_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 4 * NumVertices * sizeof(GLfloat), normals, GL_STATIC_DRAW);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(2);
-}
-void  setupLights() {
-	glUniform4f(glGetUniformLocation(program, "aLight.light"), aLight.light.x, aLight.light.y, aLight.light.z, aLight.light.w);
-	glUniform4f(glGetUniformLocation(program, "aLight.material"), aLight.material.x, aLight.material.y, aLight.material.z, aLight.material.w);
-
-	glUniform4f(glGetUniformLocation(program, "sLight.light"), sLight.light.x, sLight.light.y, sLight.light.z, sLight.light.w);
-	glUniform4f(glGetUniformLocation(program, "sLight.material"), sLight.material.x, sLight.material.y, sLight.material.z, sLight.material.w);
-	glUniform1f(glGetUniformLocation(program, "sLight.shininess"), sLight.shininess);
-
-	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
-	glUniform4f(glGetUniformLocation(program, "dLight.base.light"), dLight.light.x, dLight.light.y, dLight.light.z, dLight.light.w);
-	glUniform4f(glGetUniformLocation(program, "dLight.base.material"), dLight.material.x, dLight.material.y, dLight.material.z, dLight.material.w);
-
-}
-
-void init(void)
-{
-	vertexShaderId = setShader((char*)"vertex", (char*)"sphere7.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"sphere7.frag");
+	// Create shader program executable.
+	vertexShaderId = setShader((char*)"vertex", (char*)"directional.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"directional.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
 	glLinkProgram(program);
-	glUseProgram(program);
 
-	modelID = glGetUniformLocation(program, "modelMatrix");
-	viewID = glGetUniformLocation(program, "viewMatrix");
-	projectionID = glGetUniformLocation(program, "projectionMatrix");
-	normalID = glGetUniformLocation(program, "normalMatrix");
-
-	// frustum parameters: left, right, bottom, top, nearVal, farVal
-	//projection = glm::frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0); // In world coordinates
-
-	// Camera matrix
-	view = glm::lookAt(
-		glm::vec3(0, 0, 1),	// Camera pos in World Space
-		glm::vec3(0, 0, 0),		// and looks at the origin
-		glm::vec3(0, 1, 0)		// Head is up (set to 0,-1,0 to look upside-down)
-	);
-
-	v[0] = glm::vec3(0.0, 0.0, -1.0);
-	v[1] = glm::vec3(0.0, 0.942809, 0.333333);
-	v[2] = glm::vec3(-0.816497, -0.471405, 0.333333);
-	v[3] = glm::vec3(0.816497, -0.471405, 0.333333);
-
-
-	tetra(v[0], v[1], v[2], v[3], Ndivisions);
-
-
-	//// compute and store N-1 new points
-	for (int i = 0; i < NumVertices; ++i) {
-
-
-		vertices[i][0] = vertices1[i][0];
-		vertices[i][1] = vertices1[i][1];
-		vertices[i][2] = vertices1[i][2];
-
-
-		colors[i][0] = colors1[i][0];
-		colors[i][1] = colors1[i][1];
-		colors[i][2] = colors1[i][2];
-
-		//normals[i][0] = normals1[i][0];
-		//normals[i][1] = normals1[i][1];
-		//normals[i][2] = normals1[i][2];
-		//normals[i][3] = 0.0f;
-
-		//The position of each vertex is the true normal why bother calculating normal!
-		normals[i][0] = vertices1[i][0];
-		normals[i][1] = vertices1[i][1];
-		normals[i][2] = vertices1[i][2];
-		normals[i][3] = 0.0f;
+	GLint Success;
+	glGetProgramiv(program, GL_LINK_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Failed to link program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
 	}
 
-	setupBuffers();
+	glValidateProgram(program);
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &Success);
+	if (Success == 0) {
+		char temp[1024];
+		glGetProgramInfoLog(program, 1024, 0, temp);
+		fprintf(stderr, "Invalid Shader program:\n%s\n", temp);
+		glDeleteProgram(program);
+		program = 0;
+		exit(EXIT_FAILURE);
+	}
+	glUseProgram(program);
+
+	modelID = glGetUniformLocation(program, "model");
+	viewID = glGetUniformLocation(program, "view");
+	projID = glGetUniformLocation(program, "projection");
+}
+
+void init(void)
+{
+	srand((unsigned)time(NULL));
+
+	// Projection matrix : 45∞ Field of View, 1:1 ratio, display range : 0.1 unit <-> 100 units
+	Projection = glm::perspective(glm::radians(45.0f), 1.0f / 1.0f, 0.1f, 100.0f);
+	// Or, for an ortho camera :
+	// Projection = glm::ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.0f, 100.0f); // In world coordinates
+
+	setupShaders();
+
+	// Camera matrix
+	resetView();
+
+	loadTexture();
+
 	setupLights();
 
-	// Enable depth test.
-	glEnable(GL_DEPTH_TEST);
+	setupVAOs();
 
-	glClearColor(1.0, 1.0, 1.0, 1.0); // white background
+	// Enable depth testing and face culling. 
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
+	timer(0); // Setup my recursive 'fixed' timestep/framerate.
+}
+
+//---------------------------------------------------------------------
+//
+// calculateView
+//
+void calculateView()
+{
+	frontVec.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	frontVec.y = sin(glm::radians(pitch));
+	frontVec.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	frontVec = glm::normalize(frontVec);
+	rightVec = glm::normalize(glm::cross(frontVec, worldUp));
+	upVec = glm::normalize(glm::cross(rightVec, frontVec));
+
+	View = glm::lookAt(
+		position, // Camera position
+		position + frontVec, // Look target
+		upVec); // Up vector
 }
 
 //---------------------------------------------------------------------
 //
 // transformModel
 //
-
-void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
+void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
 	glm::mat4 Model;
 	Model = glm::mat4(1.0f);
 	Model = glm::translate(Model, translation);
 	Model = glm::rotate(Model, glm::radians(rotationAngle), rotationAxis);
-	Model = glm::scale(Model, glm::vec3(scale));
+	Model = glm::scale(Model, scale);
+
+	// We must now update the View.
+	calculateView();
 
 	glUniformMatrix4fv(modelID, 1, GL_FALSE, &Model[0][0]);
-	glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, &View[0][0]);
+	glUniformMatrix4fv(projID, 1, GL_FALSE, &Projection[0][0]);
 }
 
-
+//---------------------------------------------------------------------
+//
+// display
+//
 void display(void)
-{	
-	// Delta time stuff.
-	currentTime = glutGet(GLUT_ELAPSED_TIME); // Gets elapsed time in milliseconds.
-	deltaTime = currentTime - lastTime;
-	lastTime = currentTime;
-
+{
+	//you need this function here as light values might change
+	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glBindTexture(GL_TEXTURE_2D, blankID); // Use this texture for all shapes.
+	pTexture->Bind(GL_TEXTURE0);
 
-	glBindVertexArray(vao);
+	// Grid. 
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	g_grid.DrawShape(GL_LINE_LOOP);
 
-	// Update the ortho projection.
-	projection = glm::ortho(-1.0f + osH, 1.0f + osH, -1.0f + osV, 1.0f + osV, 0.0f, 100.0f);
-	transformObject(0.5f, X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	// Cube.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
+	g_cube.DrawShape(GL_TRIANGLES);
 
-	//Ordering the GPU to start the pipeline
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-	//glDrawArrays(GL_LINE_LOOP, 0, NumVertices);
+	angle += 2.0f;
 
-	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+	// Sphere.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, directionalLightPosition);
+	g_sphere.DrawShape(GL_TRIANGLES);
 
-	glutSwapBuffers(); // Instead of double buffering.
+	// Prism.
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 2.0f, -1.0f));
+	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), 1.0f);
+	glUniform1f(glGetUniformLocation(program, "mat.shininess"), 128);
+	g_prism.DrawShape(GL_TRIANGLES);
+
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glutSwapBuffers(); // Now for a potentially smoother render.
 }
 
-void idle()
-{
-	//glutPostRedisplay();
-}
-
-void timer(int id)
+void idle() // Not even called.
 {
 	glutPostRedisplay();
-	glutTimerFunc(33, timer, 0);
 }
 
+void parseKeys()
+{
+	if (keys & KEY_FORWARD)
+		position += frontVec * MOVESPEED;
+	if (keys & KEY_BACKWARD)
+		position -= frontVec * MOVESPEED;
+	if (keys & KEY_LEFT)
+		position -= rightVec * MOVESPEED;
+	if (keys & KEY_RIGHT)
+		position += rightVec * MOVESPEED;
+	if (keys & KEY_UP)
+		position += upVec * MOVESPEED;
+	if (keys & KEY_DOWN)
+		position -= upVec * MOVESPEED;
+}
+
+void timer(int) { // Tick of the frame.
+	// Get first timestamp
+	int start = glutGet(GLUT_ELAPSED_TIME);
+	// Update call
+	parseKeys();
+	// Display call
+	glutPostRedisplay();
+	// Calling next tick
+	int end = glutGet(GLUT_ELAPSED_TIME);
+	glutTimerFunc((1000 / FPS) - (end - start), timer, 0);
+}
+
+// Keyboard input processing routine.
 void keyDown(unsigned char key, int x, int y)
 {
-	// Orthographic.
 	switch (key)
 	{
+	case 27:
+		exit(0);
+		break;
 	case 'w':
-		osV -= scrollSpd;
+		if (!(keys & KEY_FORWARD))
+			keys |= KEY_FORWARD; // keys = keys | KEY_FORWARD
 		break;
 	case 's':
-		osV += scrollSpd;
+		if (!(keys & KEY_BACKWARD))
+			keys |= KEY_BACKWARD;
 		break;
 	case 'a':
-		osH += scrollSpd;
+		if (!(keys & KEY_LEFT))
+			keys |= KEY_LEFT;
 		break;
 	case 'd':
-		osH -= scrollSpd;
+		if (!(keys & KEY_RIGHT))
+			keys |= KEY_RIGHT;
+		break;
+	case 'r':
+		if (!(keys & KEY_UP))
+			keys |= KEY_UP;
+		break;
+	case 'f':
+		if (!(keys & KEY_DOWN))
+			keys |= KEY_DOWN;
+		break;	
+	default:
 		break;
 	}
 }
 
+void keyDownSpec(int key, int x, int y) // x and y is mouse location upon key press.
+{
+	switch (key)
+	{
+	case GLUT_KEY_UP: // Up arrow.
+		directionalLightPosition.y += 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	case GLUT_KEY_DOWN: // Down arrow.
+		directionalLightPosition.y -= 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	case GLUT_KEY_LEFT: // Left arrow.
+		directionalLightPosition.x -= 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	case GLUT_KEY_RIGHT: // DoRightwn arrow.
+		directionalLightPosition.x += 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	case GLUT_KEY_PAGE_UP: // PAGE UP.
+		directionalLightPosition.z -= 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	case GLUT_KEY_PAGE_DOWN: // PAGE DOWN.
+		directionalLightPosition.z += 1 * MOVESPEED;
+		dLight.origin = directionalLightPosition;
+		break;
+	default:
+		break;
+	}
+}
 
-void keyDownSpecial(int key, int x, int y)
+void keyUp(unsigned char key, int x, int y) // x and y is mouse location upon key press.
+{
+	switch (key)
+	{
+	case 'w':
+		keys &= ~KEY_FORWARD; // keys = keys & ~KEY_FORWARD. ~ is bitwise NOT.
+		break;
+	case 's':
+		keys &= ~KEY_BACKWARD;
+		break;
+	case 'a':
+		keys &= ~KEY_LEFT;
+		break;
+	case 'd':
+		keys &= ~KEY_RIGHT;
+		break;
+	case 'r':
+		keys &= ~KEY_UP;
+		break;
+	case 'f':
+		keys &= ~KEY_DOWN;
+		break;
+	case ' ':
+		resetView();
+		break;
+	default:
+		break;
+	}
+}
+
+void keyUpSpec(int key, int x, int y) // x and y is mouse location upon key press.
 {
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		dLight.direction.y += 0.1;
+		
 		break;
 	case GLUT_KEY_DOWN:
-		dLight.direction.y -= 0.1;
+		
 		break;
-	case GLUT_KEY_LEFT:
-		dLight.direction.x += 0.1;
+	default:
 		break;
-	case GLUT_KEY_RIGHT:
-		dLight.direction.x -= 0.1;
-		break;
-	case GLUT_KEY_PAGE_UP:
-		dLight.direction.z += 0.1;
-		break;
-	case GLUT_KEY_PAGE_DOWN:
-		dLight.direction.z -= 0.1;
 	}
-
-	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
-
-}
-
-void keyUp(unsigned char key, int x, int y)
-{
-	// Empty for now.
 }
 
 void mouseMove(int x, int y)
 {
-	//cout << "Mouse pos: " << x << "," << y << endl;
+	if (keys & KEY_MOUSECLICKED)
+	{
+		pitch += (GLfloat)((y - lastY) * TURNSPEED);
+		yaw -= (GLfloat)((x - lastX) * TURNSPEED);
+		lastY = y;
+		lastX = x;
+	}
 }
 
-void mouseDown(int btn, int state, int x, int y)
+void mouseClick(int btn, int state, int x, int y)
 {
-	cout << "Clicked: " << (btn == 0 ? "left " : "right ") << (state == 0 ? "down " : "up ") <<
-		"at " << x << "," << y << endl;
+	if (state == 0)
+	{
+		lastX = x;
+		lastY = y;
+		keys |= KEY_MOUSECLICKED; // Flip flag to true
+		glutSetCursor(GLUT_CURSOR_NONE);
+		//cout << "Mouse clicked." << endl;
+	}
+	else
+	{
+		keys &= ~KEY_MOUSECLICKED; // Reset flag to false
+		glutSetCursor(GLUT_CURSOR_INHERIT);
+		//cout << "Mouse released." << endl;
+	}
+}
+
+//---------------------------------------------------------------------
+//
+// clean
+//
+void clean()
+{
+	cout << "Cleaning up!" << endl;
+	glDeleteTextures(1, &blankID);
 }
 
 //---------------------------------------------------------------------
@@ -391,22 +502,34 @@ void mouseDown(int btn, int state, int x, int y)
 //
 int main(int argc, char** argv)
 {
+	//Before we can open a window, theremust be interaction between the windowing systemand OpenGL.In GLUT, this interaction is initiated by the following function call :
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
+	glutSetOption(GLUT_MULTISAMPLE, 8);
+
+	//if you comment out this line, a window is created with a default size
 	glutInitWindowSize(1024, 1024);
+
+	//the top-left corner of the display
+	glutInitWindowPosition(0, 0);
+
 	glutCreateWindow("Directional Light Demo");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
-	init();
 
-	// Set all our glut functions.
+	init(); // Our own custom function.
+
 	glutDisplayFunc(display);
-	glutIdleFunc(idle);
-	glutTimerFunc(33, timer, 0);
 	glutKeyboardFunc(keyDown);
+	glutSpecialFunc(keyDownSpec);
 	glutKeyboardUpFunc(keyUp);
-	glutMouseFunc(mouseDown);
-	glutSpecialFunc(keyDownSpecial);
-	glutPassiveMotionFunc(mouseMove); // or...
+	glutSpecialUpFunc(keyUpSpec);
+
+	glutMouseFunc(mouseClick);
+	glutMotionFunc(mouseMove); // Requires click to register.
+
+	atexit(clean); // This useful GLUT function calls specified function before exiting program. 
 	glutMainLoop();
+
+	return 0;
 }

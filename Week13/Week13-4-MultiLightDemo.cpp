@@ -1,10 +1,10 @@
 ﻿
-/** @file Week13-2-PointLightDemo.cpp
+/** @file Week13-4-MultiLightDemo.cpp
  *  @brief Using Shape.h + Light.h + Texture.h
  *  @note press WASD for tracking the camera or zooming in and out
  *  @note press arrow keys and page up and page down to move the light
  *  @note move mouse to yaw and pitch
- *  @attention we are using point vertex and point fragment shaders!
+ *  @attention we are using spot vertex and fragment shaders!
  *  @author Hooman Salamat
  *  @bug No known bugs.
  */
@@ -68,6 +68,7 @@ GLint width, height, bitDepth;
 //Directional Light Position (this is the sphere's position!)
 glm::vec3 directionalLightPosition = glm::vec3(8.0f, 10.0f, 0.0f);
 glm::vec3 pointLightPosition = glm::vec3(5.0f, 1.0f, -2.5f);
+glm::vec3 spotLightPosition = glm::vec3(5.0f, 1.75f, -5.0f);
 
 
 
@@ -82,13 +83,24 @@ DirectionalLight dLight(
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
 	0.5f);							// Diffuse strength.
 
-PointLight pLight(
-	glm::vec3(5.0f, 1.0f, -2.5f),	// Position.
-	//pointLightPosition,
-	50.0f,							// Range.
-	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
-	glm::vec3(0.0f, 0.0f, 1.0f),	// Diffuse color.
-	1.0f);							// Diffuse strength.
+//PointLight pLight(
+//	glm::vec3(5.0f, 1.0f, -2.5f),	// Position.
+//	//pointLightPosition,
+//	50.0f,							// Range.
+//	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
+//	glm::vec3(0.0f, 0.0f, 1.0f),	// Diffuse color.
+//	1.0f);							// Diffuse strength.
+
+PointLight pLights[2] = { { glm::vec3(7.5f, 1.0f, -5.0f), 50.0f, 1.0, 4.5f, 75.0f, glm::vec3(1.0f, 0.0f, 0.0f), 1.0f },
+						  { glm::vec3(2.5f, 0.5f, -5.0f), 50.0f, 1.0, 4.5f, 75.0f, glm::vec3(0.0f, 0.0f, 1.0f), 1.0f } };
+
+SpotLight sLight(
+	spotLightPosition,	// Position.
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
+	1.0f,							// Diffuse strength.
+	glm::vec3(0.0f, -1.0f, 0.0f),  // Direction.
+	150.0f  //edge
+);
 
 Material mat = { 0.5f, 8 }; // Alternate way to construct an object.
 
@@ -103,6 +115,7 @@ Grid g_grid(16);
 Cube g_cube;
 Prism g_prism(7);
 Sphere g_sphere(6);
+Cone g_cone(7);
 
 void timer(int); // Prototype.
 Texture* pTexture = NULL;
@@ -152,14 +165,31 @@ void setupLights()
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
 	glUniform3f(glGetUniformLocation(program, "dLight.origin"), dLight.origin.x, dLight.origin.y, dLight.origin.z);
 
-	// Setting point light.
-	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColor"), pLight.diffuseColor.x, pLight.diffuseColor.y, pLight.diffuseColor.z);
-	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
+	// Setting point lights.
+	glUniform3f(glGetUniformLocation(program, "pLights[0].base.diffuseColor"), pLights[0].diffuseColor.x, pLights[0].diffuseColor.y, pLights[0].diffuseColor.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].base.diffuseStrength"), pLights[0].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[0].position"), pLights[0].position.x, pLights[0].position.y, pLights[0].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].constant"), pLights[0].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].linear"), pLights[0].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].quadratic"), pLights[0].quadratic);
 
-	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
-	glUniform1f(glGetUniformLocation(program, "pLight.constant"), pLight.constant);
-	glUniform1f(glGetUniformLocation(program, "pLight.linear"), pLight.linear);
-	glUniform1f(glGetUniformLocation(program, "pLight.quadratic"), pLight.quadratic);
+	glUniform3f(glGetUniformLocation(program, "pLights[1].base.diffuseColor"), pLights[1].diffuseColor.x, pLights[1].diffuseColor.y, pLights[1].diffuseColor.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].base.diffuseStrength"), pLights[1].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[1].position"), pLights[1].position.x, pLights[1].position.y, pLights[1].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].constant"), pLights[1].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].linear"), pLights[1].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].quadratic"), pLights[1].quadratic);
+
+	// Setting spot light.
+	glUniform3f(glGetUniformLocation(program, "sLight.base.diffuseColor"), sLight.diffuseColor.x, sLight.diffuseColor.y, sLight.diffuseColor.z);
+	glUniform1f(glGetUniformLocation(program, "sLight.base.diffuseStrength"), sLight.diffuseStrength);
+
+	glUniform3f(glGetUniformLocation(program, "sLight.position"), sLight.position.x, sLight.position.y, sLight.position.z);
+
+	glUniform3f(glGetUniformLocation(program, "sLight.direction"), sLight.direction.x, sLight.direction.y, sLight.direction.z);
+	glUniform1f(glGetUniformLocation(program, "sLight.edge"), sLight.edgeRad);
+
+
 
 
 }
@@ -171,14 +201,15 @@ void setupVAOs()
 	g_cube.BufferShape();
 	g_prism.BufferShape();
 	g_sphere.BufferShape();
+	g_cone.BufferShape();
 }
 
 
 void setupShaders()
 {
 	// Create shader program executable.
-	vertexShaderId = setShader((char*)"vertex", (char*)"point.vert");
-	fragmentShaderId = setShader((char*)"fragment", (char*)"point.frag");
+	vertexShaderId = setShader((char*)"vertex", (char*)"multi.vert");
+	fragmentShaderId = setShader((char*)"fragment", (char*)"multi.frag");
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -231,7 +262,7 @@ void init(void)
 	setupLights();
 
 	setupVAOs();
-
+	
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -290,7 +321,6 @@ void display(void)
 	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	gridTexture->Bind(GL_TEXTURE0);
 
 	// Grid. Note: I rendered it solid!
@@ -298,11 +328,10 @@ void display(void)
 	g_grid.DrawShape(GL_TRIANGLES);
 
 	pTexture->Bind(GL_TEXTURE0);
-
 	// Cube.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
-
+	
 	angle += 2.0f;
 
 	// Sphere (directional light)
@@ -312,6 +341,10 @@ void display(void)
 	// Sphere (point light).
 	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, pointLightPosition);
 	g_sphere.DrawShape(GL_TRIANGLES);
+
+	// Cone (spot light).
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, spotLightPosition);
+	g_cone.DrawShape(GL_TRIANGLES);
 
 	// Prism.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 2.0f, -1.0f));
@@ -400,28 +433,28 @@ void keyDownSpec(int key, int x, int y) // x and y is mouse location upon key pr
 	switch (key)
 	{
 	case GLUT_KEY_UP: // Up arrow.
-		pointLightPosition.y += 1 * MOVESPEED;
-		pLight.position = pointLightPosition;
+		spotLightPosition.y += 1 * MOVESPEED;
+		sLight.position = spotLightPosition;
 		break;
 	case GLUT_KEY_DOWN: // Down arrow.
-		pointLightPosition.y -= 1 * MOVESPEED;
-		pLight.position = pointLightPosition;
+		spotLightPosition.y -= 1 * MOVESPEED;
+		sLight.position = spotLightPosition;
 		break;
 	case GLUT_KEY_LEFT: // Left arrow.
-		pointLightPosition.x -= 1 * MOVESPEED;
-		pLight.position = directionalLightPosition;
+		spotLightPosition.x -= 1 * MOVESPEED;
+		sLight.position = spotLightPosition;
 		break;
 	case GLUT_KEY_RIGHT: // DoRightwn arrow.
-		pointLightPosition.x += 1 * MOVESPEED;
-		pLight.position = pointLightPosition;
+		spotLightPosition.x += 1 * MOVESPEED;
+		sLight.position = spotLightPosition;;
 		break;
 	case GLUT_KEY_PAGE_UP: // PAGE UP.
-		pointLightPosition.z -= 1 * MOVESPEED;
-		pLight.position = directionalLightPosition;
+		spotLightPosition.z -= 1 * MOVESPEED;
+		sLight.position = spotLightPosition;
 		break;
 	case GLUT_KEY_PAGE_DOWN: // PAGE DOWN.
-		pointLightPosition.z += 1 * MOVESPEED;
-		pLight.position = pointLightPosition;
+		spotLightPosition.z += 1 * MOVESPEED;
+		sLight.position = spotLightPosition;
 		break;
 	default:
 		break;
@@ -529,7 +562,7 @@ int main(int argc, char** argv)
 	//the top-left corner of the display
 	glutInitWindowPosition(0, 0);
 
-	glutCreateWindow("Point Light Demo");
+	glutCreateWindow("Multi-Light Demo");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 
