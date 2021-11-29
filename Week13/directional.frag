@@ -20,7 +20,7 @@ struct AmbientLight
 struct DirectionalLight 
 {
 	Light base;
-	vec3 origin;
+	vec3 direction;
 };
 
 
@@ -66,7 +66,7 @@ vec4 calcLightByDirection(Light l, vec3 dir)
 
 vec4 calcDirectionalLight()
 {
-	return calcLightByDirection(dLight.base, dLight.origin);
+	return calcLightByDirection(dLight.base, dLight.direction);
 }
 
 

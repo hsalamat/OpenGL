@@ -23,9 +23,12 @@ struct AmbientLight : public Light
 
 struct DirectionalLight : public Light
 {
-	glm::vec3 origin;
-	DirectionalLight(glm::vec3 ori, glm::vec3 dCol, GLfloat dStr)
-		: Light(dCol, dStr), origin(ori) { }
+	glm::vec3 direction;
+	DirectionalLight(glm::vec3 dir, glm::vec3 dCol, GLfloat dStr)
+		: Light(dCol, dStr)
+	{
+		direction = dir;
+	}
 };
 
 struct PointLight : public Light

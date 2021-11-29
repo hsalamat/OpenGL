@@ -24,7 +24,7 @@ struct AmbientLight
 struct DirectionalLight 
 {
 	Light base;
-	vec3 origin;
+	vec3 direction;
 };
 
 struct PointLight
@@ -69,6 +69,12 @@ vec4 calcAmbientLight(Light a)
 
 vec4 calcLightByDirection(Light l, vec3 dir)
 {
+
+    //for debugging
+    //dir = vec3(-1.0f, 0.0f, -0.5f); // Direction.
+	//l.diffuseColor = vec3(1.0f, 1.0f, 0.25f);  // Diffuse color.
+	//l.diffuseStrength = 0.1f;	
+
 	float diffuseFactor = max( dot( normalize(normal), normalize(dir) ), 0.0f);
 	vec4 diffuse = vec4(l.diffuseColor, 1.0f) * l.diffuseStrength * diffuseFactor;
 
@@ -90,7 +96,7 @@ vec4 calcLightByDirection(Light l, vec3 dir)
 
 vec4 calcDirectionalLight()
 {
-	return calcLightByDirection(dLight.base, dLight.origin);
+	return calcLightByDirection(dLight.base, dLight.direction);
 }
 
 vec4 calcPointLight(PointLight p)
@@ -103,7 +109,7 @@ vec4 calcPointLight(PointLight p)
 	float attenuation = p.quadratic * distance * distance +
 						p.linear * distance +
 						p.constant;
-
+    //attenuation = 5.0;
 	return (color / attenuation);
 }
 
@@ -114,7 +120,7 @@ vec4 calcSpotLight(SpotLight s)
 	float slFactor = dot(rayDirection, s.direction);
 	if (slFactor > s.edge) //inside the cone?
 	{
-		vec3 direction = fragPos - s.position;
+		vec3 direction =  s.position - fragPos;
 		float distance = length(direction);
 		direction = normalize(direction);
 		color = calcLightByDirection(s.base, direction);

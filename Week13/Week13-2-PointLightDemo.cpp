@@ -85,7 +85,7 @@ DirectionalLight dLight(
 PointLight pLight(
 	glm::vec3(5.0f, 1.0f, -2.5f),	// Position.
 	//pointLightPosition,
-	50.0f,							// Range.
+	45.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
 	glm::vec3(0.0f, 0.0f, 1.0f),	// Diffuse color.
 	1.0f);							// Diffuse strength.
@@ -150,7 +150,7 @@ void setupLights()
 	// Setting directional light.
 	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColor"), dLight.diffuseColor.x, dLight.diffuseColor.y, dLight.diffuseColor.z);
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
-	glUniform3f(glGetUniformLocation(program, "dLight.origin"), dLight.origin.x, dLight.origin.y, dLight.origin.z);
+	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
 
 	// Setting point light.
 	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColor"), pLight.diffuseColor.x, pLight.diffuseColor.y, pLight.diffuseColor.z);

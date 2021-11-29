@@ -20,7 +20,7 @@ struct AmbientLight
 struct DirectionalLight 
 {
 	Light base;
-	vec3 origin;
+	vec3 direction;
 };
 
 struct PointLight
@@ -84,7 +84,7 @@ vec4 calcLightByDirection(Light l, vec3 dir)
 
 vec4 calcDirectionalLight()
 {
-	return calcLightByDirection(dLight.base, dLight.origin);
+	return calcLightByDirection(dLight.base, dLight.direction);
 }
 
 vec4 calcPointLight()
@@ -109,7 +109,7 @@ vec4 calcSpotLight(SpotLight s)
 	float slFactor = dot(rayDirection, s.direction);
 	if (slFactor > s.edge)
 	{
-		vec3 direction = fragPos - s.position;
+		vec3 direction =  s.position - fragPos;
 		float distance = length(direction);
 		direction = normalize(direction);
 		color = calcLightByDirection(s.base, direction);

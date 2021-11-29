@@ -152,7 +152,7 @@ void setupLights()
 	// Setting directional light.
 	glUniform3f(glGetUniformLocation(program, "dLight.base.diffuseColor"), dLight.diffuseColor.x, dLight.diffuseColor.y, dLight.diffuseColor.z);
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
-	glUniform3f(glGetUniformLocation(program, "dLight.origin"), dLight.origin.x, dLight.origin.y, dLight.origin.z);
+	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
 
 }
 
@@ -385,27 +385,27 @@ void keyDownSpec(int key, int x, int y) // x and y is mouse location upon key pr
 	{
 	case GLUT_KEY_UP: // Up arrow.
 		directionalLightPosition.y += 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_DOWN: // Down arrow.
 		directionalLightPosition.y -= 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_LEFT: // Left arrow.
 		directionalLightPosition.x -= 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_RIGHT: // DoRightwn arrow.
 		directionalLightPosition.x += 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_UP: // PAGE UP.
 		directionalLightPosition.z -= 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_DOWN: // PAGE DOWN.
 		directionalLightPosition.z += 1 * MOVESPEED;
-		dLight.origin = directionalLightPosition;
+		dLight.direction = directionalLightPosition;
 		break;
 	default:
 		break;
