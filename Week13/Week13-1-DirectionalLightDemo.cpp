@@ -75,8 +75,8 @@ AmbientLight aLight(
 	0.1f);							// Diffuse strength.
 
 DirectionalLight dLight(
-	//glm::vec3(0.0f, 10.0f, 0.0f),	// Origin.
-	directionalLightPosition,
+	glm::vec3(0.0f, 1.0f, 0.0f),	// direction.using the origin
+  //directionalLightPosition,
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
 	1.0f);							// Diffuse strength.
 
@@ -97,11 +97,12 @@ Sphere g_sphere(5);
 void timer(int); // Prototype.
 
 Texture* pTexture = NULL;
+Texture* blankTexture = NULL;
 GLuint textureID;
 
 void resetView()
 {
-	position = glm::vec3(8.0f, 5.0f, 20.0f); 
+	position = glm::vec3(8.0f, 5.0f, 20.0f);
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
@@ -109,7 +110,7 @@ void resetView()
 }
 
 
-void loadTexture()
+void loadTextures()
 {
 	//// Image loading.
 	//stbi_set_flip_vertically_on_load(true);
@@ -131,11 +132,13 @@ void loadTexture()
 	//// End first image.
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-	pTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
+	pTexture = new Texture(GL_TEXTURE_2D, "Media/sugary.bmp", GL_RGB);
 	pTexture->Bind(GL_TEXTURE0);
-	if (!pTexture->Load()) {
-		exit(0);
-	}
+	pTexture->Load();
+
+	blankTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
+	blankTexture->Bind(GL_TEXTURE0);
+	blankTexture->Load();
 
 }
 
@@ -217,7 +220,7 @@ void init(void)
 	// Camera matrix
 	resetView();
 
-	loadTexture();
+	loadTextures();
 
 	setupLights();
 
@@ -281,27 +284,39 @@ void display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glBindTexture(GL_TEXTURE_2D, blankID); // Use this texture for all shapes.
-	pTexture->Bind(GL_TEXTURE0);
+
 
 	// Grid. 
+	blankTexture->Bind(GL_TEXTURE0);
+	g_grid.RecolorShape(1.0, 0.0, 1.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	g_grid.DrawShape(GL_LINE_LOOP);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Cube.
+	pTexture->Bind(GL_TEXTURE0);
+	g_cube.RecolorShape(0.0, 1.0, 1.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	angle += 2.0f;
 
 	// Sphere.
+	blankTexture->Bind(GL_TEXTURE0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, directionalLightPosition);
+	g_sphere.RecolorShape(1.0, 1.0, 1.0);
 	g_sphere.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Prism.
+	blankTexture->Bind(GL_TEXTURE0);
+	g_prism.RecolorShape(0.0, 1.0, 0.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 2.0f, -1.0f));
 	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), 1.0f);
 	glUniform1f(glGetUniformLocation(program, "mat.shininess"), 128);
 	g_prism.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -373,7 +388,7 @@ void keyDown(unsigned char key, int x, int y)
 	case 'f':
 		if (!(keys & KEY_DOWN))
 			keys |= KEY_DOWN;
-		break;	
+		break;
 	default:
 		break;
 	}
@@ -385,27 +400,27 @@ void keyDownSpec(int key, int x, int y) // x and y is mouse location upon key pr
 	{
 	case GLUT_KEY_UP: // Up arrow.
 		directionalLightPosition.y += 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_DOWN: // Down arrow.
 		directionalLightPosition.y -= 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_LEFT: // Left arrow.
 		directionalLightPosition.x -= 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_RIGHT: // DoRightwn arrow.
 		directionalLightPosition.x += 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_UP: // PAGE UP.
 		directionalLightPosition.z -= 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_DOWN: // PAGE DOWN.
 		directionalLightPosition.z += 1 * MOVESPEED;
-		dLight.direction = directionalLightPosition;
+		//dLight.direction = directionalLightPosition;
 		break;
 	default:
 		break;
@@ -447,10 +462,10 @@ void keyUpSpec(int key, int x, int y) // x and y is mouse location upon key pres
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		
+
 		break;
 	case GLUT_KEY_DOWN:
-		
+
 		break;
 	default:
 		break;

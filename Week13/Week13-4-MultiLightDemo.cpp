@@ -262,7 +262,7 @@ void init(void)
 	setupLights();
 
 	setupVAOs();
-	
+
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -331,15 +331,22 @@ void display(void)
 	// Cube.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
-	
+
 	angle += 2.0f;
 
 	// Sphere (directional light)
+	g_sphere.RecolorShape(1.0, 1.0, 0.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, directionalLightPosition);
 	g_sphere.DrawShape(GL_TRIANGLES);
 
-	// Sphere (point light).
-	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, pointLightPosition);
+	// Sphere (point light 1).
+	g_sphere.RecolorShape(0.0, 0.0, 1.0);
+	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, glm::vec3(7.5f, 1.0f, -5.0f));
+	g_sphere.DrawShape(GL_TRIANGLES);
+
+	// Sphere (point light 2).
+	g_sphere.RecolorShape(1.0, 0.0, 0.0);
+	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, glm::vec3(2.5f, 0.5f, -5.0f));
 	g_sphere.DrawShape(GL_TRIANGLES);
 
 	// Cone (spot light).

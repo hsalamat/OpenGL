@@ -232,7 +232,7 @@ void init(void)
 	setupLights();
 
 	setupVAOs();
-	
+
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -291,7 +291,7 @@ void display(void)
 	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	gridTexture->Bind(GL_TEXTURE0);
 
 	// Grid. Note: I rendered it solid!
@@ -307,10 +307,12 @@ void display(void)
 	angle += 2.0f;
 
 	// Sphere (directional light)
+	g_sphere.RecolorShape(1.0, 1.0, 0.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, directionalLightPosition);
 	g_sphere.DrawShape(GL_TRIANGLES);
 
 	// Sphere (point light).
+	g_sphere.RecolorShape(0.0, 0.0, 1.0);
 	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, pointLightPosition);
 	g_sphere.DrawShape(GL_TRIANGLES);
 
