@@ -1,6 +1,24 @@
 ﻿
 /** @file Week14-1-BlendingDemo.cpp
- *  @brief Using Shape.h + Light.h + Texture.h
+ *  @brief Blending Demo and Alpha Compositing
+ *  In computer graphics, alpha compositing is the process of combining an image with a background to create the appearance of partial or full transparency.
+ *  When alpha blending is enabled in the OpenGL pipeline, we use this form for their blending:
+ *	DestinationColor.rgb = (SourceColor.rgb * SourceColor.a) + (DestinationColor.rgb * (1 - SourceColor.a));
+ *  SourceColor: the source color vector. This is the color output of the fragment shader.
+ *  DestinationColor: the destination color vector. This is the color vector that is currently stored in the color buffer
+ *  Now that we have enabled blending we need to tell OpenGL how it should actually blend.
+ *  Imagine we have two triangles where we want to draw the semi-transparent blue triangle on top of the yellow triangle. 
+ *  The yellow triangle will be the destination color (and therefore should be first in the color buffer) 
+ *  and we are now going to draw the blue triangle over the yellow triangle.
+ *  If the blue triangle contributes 60% to the final color we want the yellow triangle to contribute 40% of the final color (e.g. 1.0 - 0.6). 
+ *  color(RGBA) =(1.0,1.0,0.0,0.6)∗0.6+(0.0,0.0,1.0,1.0)∗(1−0.6)
+ *  But how do we actually tell OpenGL to use factors? There is a function for this called glBlendFunc.
+ *  Syntax: void glBlendFunc(sfactor, dfactor);
+ *  Parameters:
+ *  sfactor:A GLenum specifying a multiplier for the source blending factors. The default value is GL_ONE. 
+ *  dfactor: A GLenum specifying a multiplier for the destination blending factors. The default value is GL_ZERO. 
+ *  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
  *  @note press WASD for tracking the camera or zooming in and out
  *  @note press arrow keys and page up and page down to move the light
  *  @note move mouse to yaw and pitch
@@ -72,7 +90,7 @@ glm::vec3 directionalLightPosition = glm::vec3(8.0f, 10.0f, 0.0f);
 // Light objects. Now OOP.
 AmbientLight aLight(
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
-	0.3f);							// Diffuse strength.
+	0.5f);							// Diffuse strength.
 
 DirectionalLight dLight(
 	glm::vec3(0.0f, 0.0f, 1.0f),	// direction using the origin
@@ -219,10 +237,10 @@ void init(void)
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ZERO);
+	//glBlendFunc(GL_ONE, GL_ZERO);
 
 	//we want to take the alpha of the source color vector for the source factor and 1−alpha of the same color vector for the destination factor.
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//It is also possible to set different options for the RGB and alpha channel individually
 	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,   GL_ZERO, GL_ZERO );
@@ -261,9 +279,9 @@ void init(void)
 	glEnable(GL_POLYGON_SMOOTH);
 
 
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 
 	timer(0); // Setup my recursive 'fixed' timestep/framerate.
 }

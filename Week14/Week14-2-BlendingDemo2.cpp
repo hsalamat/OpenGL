@@ -1,10 +1,18 @@
 ﻿
 /** @file Week14-2-BlendingDemo2.cpp
- *  @brief Using Shape.h + Light.h + Texture.h
+ *  @brief glBlendEquation Demo
+ *  glBlendEquation specifies how source and destination colors are combined
+ * 
+ *  GL_FUNC_ADD: the default, adds both colors to each other: C_result=Src+DstC_result=Src+Dst.
+ *  GL_FUNC_SUBTRACT: subtracts both colors from each other: C_result=Src−DstC_result=Src−Dst.
+ *  GL_FUNC_REVERSE_SUBTRACT: subtracts both colors, but reverses order: C_result=Dst−SrcC_result=Dst−Src.
+ *  GL_MIN: takes the component-wise minimum of both colors: C_result=min(Dst,Src)C_result=min(Dst,Src).
+ *  GL_MAX: takes the component-wise maximum of both colors: C_result=max(Dst,Src)C_result=max(Dst,Src).
+
  *  @note press WASD for tracking the camera or zooming in and out
- *  @note press arrow keys and page up and page down to move the light
+ *  @note press arrow keys and page up and page down to move the spot light (cone)
  *  @note move mouse to yaw and pitch
- *  @attention we are using spot vertex and fragment shaders!
+ *  @attention we are using multi vertex and fragment shaders!
  *  @author Hooman Salamat
  *  @bug No known bugs.
  */
@@ -321,9 +329,9 @@ void init(void)
 
 
 	// Enable face culling.
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 
 	timer(0); // Setup my recursive 'fixed' timestep/framerate.
 }
