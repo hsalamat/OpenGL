@@ -1,9 +1,11 @@
 
 ///////////////////////////////////////////////////////////////////////
 //
-// InteractiveAnimation.cpp
+// InteractiveAnimation Circle
 //Interactively, via keyboard or mouse input, with the help of their callback routines 
 //to invoke transformations.
+// Press + and - to increase and decrease the edges so they look like a circle
+// Press left/middle/right mouse button to rotate around x, y, or z axis
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -40,42 +42,13 @@ int deltaTime, currentTime, lastTime = 0;
 int w = 512, h = 512;
 int counter = 0;
 
-GLshort cube_indices[] = {
-	// Front.
-	3, 2, 1, 0,
-	// Left.
-	0, 3, 7, 4,
-	// Bottom.
-	4, 0, 1, 5,
-	// Right.
-	5, 1, 2, 6,
-	// Back.
-	6, 5, 4, 7,
-	// Top.
-	7, 6, 2, 3
-};
+// Globals.
+static float R = 1.0; // Radius of circle.
+static float X = 0.0; // X-coordinate of center of circle.
+static float Y = 0.0; // Y-coordinate of center of circle.
+static int numVertices = 5; // Number of vertices on circle.
+#define PI 3.14159265358979324
 
-GLfloat cube_vertices[] = {
-	-0.9f, -0.9f, 0.9f,		// 0.
-	0.9f, -0.9f, 0.9f,		// 1.
-	0.9f, 0.9f, 0.9f,		// 2.
-	-0.9f, 0.9f, 0.9f,		// 3.
-	-0.9f, -0.9f, -0.9f,	// 4.
-	0.9f, -0.9f, -0.9f,		// 5.
-	0.9f, 0.9f, -0.9f,		// 6.
-	-0.9f, 0.9f, -0.9f,		// 7.
-};
-
-GLfloat colors[] = {
-	1.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 0.0f,
-	1.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 1.0f,
-	0.5f, 0.0f, 0.0f,
-	0.0f, 0.5f, 0.0f
-};
 
 static unsigned int
 program,
@@ -104,19 +77,19 @@ void init(void)
 
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
 	points_vbo = 0;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
 	colors_vbo = 0;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
@@ -153,15 +126,55 @@ void display(void)
 
 	glBindVertexArray(vao);
 
+	float t = 0; // Angle parameter.
+	int i;
+	GLfloat colors[1000];
+	GLshort circle_indices[300];
+	GLfloat circle_vertices[1000];
+	int index = 0;
+
+
+	for (i = 0; i < numVertices; ++i)
+	{
+		/*glColor3f((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
+		glVertex3f(X + R * cos(t), Y + R * sin(t), 0.0);*/
+
+
+		colors[index] = (float)rand() / (float)RAND_MAX;
+		circle_indices[i] = i;
+		circle_vertices[index++] = X + R * cos(t);
+
+		colors[index] = (float)rand() / (float)RAND_MAX;
+		circle_indices[i] = i;
+		circle_vertices[index++] = Y + R * sin(t);
+
+		colors[index] = (float)rand() / (float)RAND_MAX;
+		circle_indices[i] = i;
+		circle_vertices[index++] = 0.0f;
+		
+		t += 2 * PI / numVertices;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(circle_indices), circle_indices, GL_STATIC_DRAW);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(circle_vertices), circle_vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+
 	transformObject(0.5f, axis, (float)theta[axis2]++, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
-	//glDrawElements(GL_LINE_LOOP, 24, GL_UNSIGNED_SHORT, 0);
+	//glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-	glutSwapBuffers(); // Instead of double buffering.
+	glutSwapBuffers(); // double buffering.
 }
 
 void idle()
@@ -193,32 +206,40 @@ void mouse(int button, int state, int x, int y)
 
 void myKey(unsigned char key, int x, int y)
 {
-	if (key == 'q' || key == 'Q') exit(0);
-
-	if (key == 'x')
+	switch (key)
 	{
+	case 27:
+		exit(0);
+		break;
+	case '+':
+		numVertices++;
+		glutPostRedisplay();
+		break;
+	case '-':
+		if (numVertices > 3) numVertices--;
+		glutPostRedisplay();
+		break;
+	case 'x':
 		axis = X_AXIS;
 		axis2 = 0;
-	}
-	if (key == 'y')
-	{
+		glutPostRedisplay();
+		break;
+	case 'y':
 		axis = Y_AXIS;
 		axis2 = 1;
-	}
-
-	if (key == 'z')
-	{
+		glutPostRedisplay();
+		break;
+	case 'z':
 		axis = Z_AXIS;
 		axis2 = 2;
+		glutPostRedisplay();
+		break;
+	default:
+		break;
 	}
 }
-//---------------------------------------------------------------------
-//
-// main
-//
 
-
-void spinCube()
+void spin()
 {
 	if (theta[axis2] > 360.0) theta[axis2] -= 360.0;
 	glutPostRedisplay();
@@ -253,8 +274,7 @@ int main(int argc, char** argv)
 	//registered in a single callback function, such as
 	glutKeyboardFunc(myKey);
 
-	glutIdleFunc(spinCube);
-
+	glutIdleFunc(spin);
 
 	glutMainLoop();
 

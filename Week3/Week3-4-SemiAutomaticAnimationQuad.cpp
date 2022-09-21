@@ -131,7 +131,7 @@ void idle()
 void timer(int)
 {
 	glutPostRedisplay(); //call the drawScene
-	glutTimerFunc(1000 / 60, timer, 0); //ine one second, this function calls itself 60 times
+	glutTimerFunc(1000 / 30, timer, 0); //ine one second, this function calls itself 60 times
 
 	switch (direction)
 	{
@@ -139,7 +139,7 @@ void timer(int)
 
 		if (x_position < 0.8)
 		{
-			x_position += 0.005;
+			x_position += 0.1;
 		}
 		else
 		{
@@ -150,7 +150,7 @@ void timer(int)
 	case -1:
 		if (x_position >= -1.0)
 		{
-			x_position -= 0.005;
+			x_position -= 0.1;
 		}
 		else
 		{

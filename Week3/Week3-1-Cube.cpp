@@ -76,6 +76,8 @@ GLfloat colors[] = {
 	0.0f, 0.5f, 0.0f
 };
 
+
+
 static unsigned int
 program,
 vertexShaderId,
@@ -124,6 +126,10 @@ void init(void)
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
+
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 //---------------------------------------------------------------------
@@ -157,9 +163,11 @@ void display(void)
 	//transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)90 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
+	//glDrawArrays(GL_TRIANGLES, 0, 8);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
+	
 	//glDrawElements(GL_LINE_STRIP, 36, GL_UNSIGNED_SHORT, 0);
-
+	
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 	glutSwapBuffers(); // Now for a potentially smoother render.

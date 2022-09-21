@@ -199,7 +199,7 @@ void demo_menu(int id)
 void timer(int)
 {
 	glutPostRedisplay(); //call the drawScene
-	glutTimerFunc(1000 / 100, timer, 0); //ine one second, this function calls itself 60 times
+	glutTimerFunc(1000 / 10, timer, 0); //ine one second, this function calls itself 60 times
 }
 
 //---------------------------------------------------------------------
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(myKey);
 
 	//glutIdleFunc(idle);
-	glutTimerFunc(100, timer, 0); //every second
+	glutTimerFunc(1000, timer, 0); //every second
 
 
 	glutMainLoop();

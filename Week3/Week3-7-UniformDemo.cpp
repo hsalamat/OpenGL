@@ -131,6 +131,10 @@ void init(void)
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
+
+	glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
 }
 
 //---------------------------------------------------------------------
@@ -167,8 +171,8 @@ void display(void)
 	glUniform1f(timeParam, etime);
 
 	//Ordering the GPU to start the pipeline
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
-	//glDrawElements(GL_LINE_STRIP, 36, GL_UNSIGNED_SHORT, 0);
+	//glDrawElements(GL_LINES, 2, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
+	glDrawElements(GL_LINE_STRIP, 36, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 

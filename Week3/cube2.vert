@@ -13,5 +13,6 @@ void main()
 {
 	gl_Position = model * vec4(vertex_position, 1.0);
 	gl_Position.x *= (1+sin(time));
+	gl_Position.y *= (1+cos(time));
 	color = vertex_color;
 }

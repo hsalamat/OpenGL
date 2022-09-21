@@ -39,8 +39,7 @@ int w = 512, h = 512;
 int counter = 0;
 
 GLshort cube_indices[] = {
-	// Front.
-	3, 2, 1, 0,
+	
 	// Left.
 	0, 3, 7, 4,
 	// Bottom.
@@ -50,7 +49,9 @@ GLshort cube_indices[] = {
 	// Back.
 	6, 5, 4, 7,
 	// Top.
-	7, 6, 2, 3
+	7, 6, 2, 3,
+	// Front.
+	3, 2, 1, 0,
 };
 
 GLfloat cube_vertices[] = {
@@ -151,7 +152,8 @@ void display(void)
 
 	glBindVertexArray(vao);
 
-	transformObject(0.5f, YZ_AXIS, (float)counter++, glm::vec3(0.0f, 0.0f, 0.0f));
+	//counter += 0.1f;
+	transformObject(0.5f, YZ_AXIS, counter++, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
@@ -165,6 +167,7 @@ void display(void)
 void idle()
 {
 	glutPostRedisplay();
+	//display();
 }
 
 void mouse(int button, int state, int x, int y)
@@ -182,6 +185,7 @@ void mouse(int button, int state, int x, int y)
 void myKey(unsigned char key, int x, int y)
 {
 	if (key == 'q' || key == 'Q') exit(0);
+	//if (key == 's' ) glutIdleFunc(NULL);
 }
 //---------------------------------------------------------------------
 //
