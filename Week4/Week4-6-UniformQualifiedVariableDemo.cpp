@@ -159,8 +159,6 @@ void display(void)
 
 	transformObject(0.5f, YZ_AXIS, (float)45 , glm::vec3(0.0f, 0.0f, 0.0f));
 
-	//transformObject(0.4f, axis, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
-
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
 	

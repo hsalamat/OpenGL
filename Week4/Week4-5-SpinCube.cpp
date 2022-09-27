@@ -144,7 +144,7 @@ void display(void)
 
 	glBindVertexArray(vao);
 
-	transformObject(0.4f, axis, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.4f, axis, rotAngle += ((float)1 / (float)60 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);

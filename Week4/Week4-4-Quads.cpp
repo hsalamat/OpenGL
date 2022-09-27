@@ -108,9 +108,9 @@ void init(void)
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
-	/*glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);*/
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CW);
+	//glCullFace(GL_BACK);
 }
 
 //---------------------------------------------------------------------
@@ -143,7 +143,7 @@ void display(void)
 
 	glBindVertexArray(vao);
 
-	transformObject(0.4f, YZ_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.4f, YZ_AXIS, rotAngle += ((float)1 / (float)60 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);

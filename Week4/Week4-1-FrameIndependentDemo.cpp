@@ -153,7 +153,7 @@ void display(void)
 
 	glBindVertexArray(vao);
 
-	transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)10 / (float)1000 * deltaTime), 
+	transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)1.0 / (float)60.0f * deltaTime), 
 		glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline

@@ -1,6 +1,6 @@
 
 //
-// Perspective view of a color cube using LookAt() and Ortho()
+// Orthographic view of a color cube using LookAt() and Ortho()
 //
 // Colors are assigned to each face!
 //
@@ -216,8 +216,6 @@ void display(void)
 	projection = glm::ortho(leftA, rightA, bottom, top, zNear, zFar);
 	//projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 100.0f); // In world coordinates
 
-
-	//transformObject(0.2f, X_AXIS, rotAngle = 0.0 , glm::vec3(0.0f, 0.0f, 0.0f));
 	transformObject(0.2f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 

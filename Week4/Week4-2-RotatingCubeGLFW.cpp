@@ -123,7 +123,7 @@ void setup(void)
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-// Enable depth test.
+	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_CULL_FACE);
@@ -164,15 +164,14 @@ void drawScene(void)
 	glColor3f(1.0, 0.0, 0.0);
 
 	// Delta time stuff.
-	currentTime = glfwGetTime(); // Gets elapsed time in seconds.
+	currentTime = glfwGetTime(); // Gets elapsed time in seconds!
 	deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
 
 	glBindVertexArray(vao);
 
-	//transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)1), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)1 * deltaTime * 10), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)1000.0 / (float)60.0f) * deltaTime, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
@@ -180,7 +179,7 @@ void drawScene(void)
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 	glfwSwapBuffers(window); // Swap buffers. 
-							 // See comments about double-buffering in main() below.
+	// See comments about double-buffering in main() below.
 }
 
 // Keyboard input processing routine.
@@ -201,13 +200,13 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // OpenGL minor version number.
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE); // OpenGL compatiblity profile.
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE); // Double buffering. This is the default which some
-												  // systems may not even allow to be turned off
-												  // (say, to get single-buffering as in square.cpp). 
-												  // Therefore, buffer swapping may be required
-												  // as in drawScene() above.
+	// systems may not even allow to be turned off
+	// (say, to get single-buffering as in square.cpp). 
+	// Therefore, buffer swapping may be required
+	// as in drawScene() above.
 
 	window = glfwCreateWindow(1024, 1024, "RotatingCubeGLFW.cpp", NULL, NULL); // Create OpenGL window and return
-																	   // a handle to the window.
+	// a handle to the window.
 
 	glfwSetWindowPos(window, 100, 100); // Set window position.
 	glfwMakeContextCurrent(window); // Sets the OpenGL context of the window as current.
@@ -221,7 +220,7 @@ int main(int argc, char** argv)
 
 	glfwGetWindowSize(window, &w, &h); // Obtain window size.
 	resize(window, w, h); // Initial call to resize() which is not automatically
-						  // instigated by window creation as in FreeGLUT.
+	// instigated by window creation as in FreeGLUT.
 
 	while (!glfwWindowShouldClose(window)) // Loop while window close alert is not set.
 	{
