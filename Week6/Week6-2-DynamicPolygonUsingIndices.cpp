@@ -61,7 +61,8 @@ std::array<glm::vec3, MaxNumVertices> colors = {};
 
 GLfloat shape_vertices[MaxNumVertices][3] = { 0 };
 GLfloat shape_colors[MaxNumVertices][3] = { 0 };
-GLshort shape_indices[MaxNumVertices] = { 0 };
+GLint shape_indices[MaxNumVertices] = { 0 };
+
 
 // Globals.
 static int isWire = 0; // Is wireframe?
@@ -107,7 +108,7 @@ void init(void)
 	modelID = glGetUniformLocation(program, "mvp");
 	colorID = glGetAttribLocation(program, "vertex_color");
 
-	projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 4.0f); // In world coordinates
+	projection = glm::ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.0f, 4.0f); // In world coordinates
 
 	// Camera matrix
 	view = glm::lookAt(
@@ -196,11 +197,11 @@ void display(void)
 
 	glBindVertexArray(1);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shape_indices), shape_indices, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_vertices), shape_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_vertices), shape_vertices, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_DYNAMIC_DRAW);
 
 	//transformObject(0.4f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 	transformObject(1.0f, X_AXIS, rotAngle = 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -208,13 +209,15 @@ void display(void)
 
 	if (isWire)
 	{
+		//what is the problem here? how come index doesn't work'
 		//glDrawArrays(GL_LINE_LOOP, 0, numVertices);
-		glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, 0);
 	}
 	else
 	{
 		//glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
-		glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, NULL);
+		//what is the problem here? how come index doesn't work'
+		glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, 0);
 	}
 
 

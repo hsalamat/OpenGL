@@ -56,7 +56,7 @@ std::array<glm::vec3, MaxNumVertices> colors = {};
 
 GLfloat shape_vertices[MaxNumVertices][3] = { 0 };
 GLfloat shape_colors[MaxNumVertices][3] = { 0 };
-GLshort shape_indices[MaxNumVertices] = { 0 };
+GLint shape_indices[MaxNumVertices] = { 0 };
 
 // Globals.
 static int isWire = 0; // Is wireframe?
