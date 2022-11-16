@@ -13,8 +13,12 @@
 #include "prepShader.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
+ //step1
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+
+
 #include <array>
 using namespace std;
 
@@ -29,10 +33,16 @@ const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
 GLfloat cube_vertices[NumVertices][3] = { 0 };
 GLfloat cube_colors[NumVertices][3] = { 0 };
+
+//step2
 GLfloat cube_texCoords[NumVertices][2] = { 0 };
 
 // IDs.
-GLuint vao, ibo, points_vbo, colors_vbo, texCoords_vbo, modelID;
+GLuint vao, ibo, points_vbo, colors_vbo, modelID;
+
+//step3
+GLuint texCoords_vbo;
+
 
 // Camera and transform variables.
 glm::vec3 position, frontVec, worldUp, upVec, rightVec; // Set by function.
@@ -79,6 +89,9 @@ fragmentShaderId;
 
 std::array<glm::vec3, 36> vertices = {};
 std::array<glm::vec3, 36> colors = {};
+
+
+//step4
 std::array<glm::vec2, 36> texCoords = {};
 
 std::array<glm::vec3, 8> unique_vertices = {
@@ -116,6 +129,8 @@ std::array<glm::vec3, 8> unique_colors = {
 	glm::vec3(1.0f, 1.0f, 1.0f)   //white
 };
 
+
+//step5
 std::array<glm::vec2, 6> unique_texCoords = {
 	glm::vec2(1.0f, 0.0f),
 	glm::vec2(1.0f, 1.0f),
@@ -134,6 +149,8 @@ std::array<glm::vec2, 6> unique_texCoords = {
 
 int Index = 0;
 
+
+//step6
 void quad(int a, int b, int c, int d, int e, int f)
 {
 	texCoords[Index] = unique_texCoords[0];  colors[Index] = unique_colors[a]; vertices[Index] = unique_vertices[a]; Index++;
@@ -147,6 +164,7 @@ void quad(int a, int b, int c, int d, int e, int f)
 //----------------------------------------------------------------------------
 
 
+//step7
 void loadTexture()
 {
 	stbi_set_flip_vertically_on_load(true);
@@ -198,6 +216,7 @@ void colorcube()
 		cube_colors[i][1] = colors[i][1];
 		cube_colors[i][2] = colors[i][2];
 
+		//step8
 		cube_texCoords[i][0] = texCoords[i][0];
 		cube_texCoords[i][1] = texCoords[i][1];
 	}
@@ -224,6 +243,8 @@ void createBuffer()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
 
+
+	//step9
 	texCoords_vbo = 0;
 	glGenBuffers(1, &texCoords_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, texCoords_vbo);
@@ -266,8 +287,11 @@ void calculateView()
 
 void init(void)
 {
+	//step10
 	vertexShaderId = setShader((char*)"vertex", (char*)"triangles.vert");
 	fragmentShaderId = setShader((char*)"fragment", (char*)"triangles.frag");
+
+
 	program = glCreateProgram();
 	glAttachShader(program, vertexShaderId);
 	glAttachShader(program, fragmentShaderId);
@@ -280,6 +304,8 @@ void init(void)
 
 	resetView();
 	createBuffer();
+
+	//step11
 	loadTexture();
 
 // Enable depth test.
@@ -424,6 +450,7 @@ void mouseClick(int btn, int state, int x, int y)
 	}
 }
 
+//step12
 void clean()
 {
 	cout << "Cleaning up!" << endl;
@@ -453,6 +480,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouseClick);
 	//glutPassiveMotionFunc(mouseMove); // or...
 	glutMotionFunc(mouseMove); // Requires click to register.
+
+	//step13
 	atexit(clean); // This GLUT function calls specified function before terminating program. Useful!
 	glutMainLoop();
 }
