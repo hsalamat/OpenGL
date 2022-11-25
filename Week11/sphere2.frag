@@ -9,8 +9,8 @@ out vec4 frag_color;
 void main()
 {
  //Lambert's cosine law
- float lambertTerm = dot(N,-L);
- float Kd = max (dot (N, -L) , 0.0);
+ float lambertTerm = dot(N, L);
+ float Kd = max (dot (N, L) , 0.0);
  
  //Final Color
  vec4 vColor = materialDiffuse * lightDiffuse * Kd;

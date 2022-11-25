@@ -68,7 +68,7 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
+glm::vec4 lightPosition = glm::vec4(1.0f, 1.0f, 1.0f,1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f,1.0f);
 
@@ -279,8 +279,8 @@ void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngl
 	// no scaling in this example we could just use modelView matrix in shaders
 	//glUniformMatrix4fv(normalID, 1, GL_FALSE, &mv[0][0]);
 	
-	glm::mat4 normalMatrix;
-	normalMatrix = glm::inverse(Model);
+    glm::mat4 normalMatrix;
+    normalMatrix = glm::inverse(Model);
 	glUniformMatrix4fv(normalID, 1, GL_TRUE, &normalMatrix[0][0]);
 	
 }
@@ -300,11 +300,17 @@ void display(void)
 
 	// Update the ortho projection.
 	projection = glm::ortho(-1.0f + osH, 1.0f + osH, -1.0f + osV, 1.0f + osV, 0.0f, 100.0f);
-	transformObject(glm::vec3(0.25f, 0.5f, 0.5f), X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(glm::vec3(0.25f, 0.5f, 0.5f), X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(-0.25f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 	//glDrawArrays(GL_LINE_LOOP, 0, NumVertices);
+
+
+	transformObject(glm::vec3(0.5f, 0.25f, 0.5f), X_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.25f, 0.0f, 0.0f));
+
+	//Ordering the GPU to start the pipeline
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 

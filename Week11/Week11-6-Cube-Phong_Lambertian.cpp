@@ -76,7 +76,7 @@ GLfloat  zNear = 0.5, zFar = 3.0;
 GLfloat  fovy = 45.0f;  // Field-of-view in Y direction angle (in degrees)
 GLfloat  aspect = 4.0f / 2.0f;       // Viewport aspect ratio
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 0.0f);
+glm::vec4 lightPosition = glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 materialDiffuse = glm::vec4(0.5f, 0.8f, 0.1f, 1.0f);
 
@@ -278,12 +278,12 @@ void display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3  eye(radius * sin(theta) * cos(phi),
-		radius * sin(theta) * sin(phi),
-		radius * cos(theta)
-	);
+	//glm::vec3  eye(radius * sin(theta) * cos(phi),
+	//	radius * sin(theta) * sin(phi),
+	//	radius * cos(theta)
+	//);
 
-	//glm::vec3  eye(0.0, 0.0, 1.0);
+	glm::vec3  eye(0.0, 0.0, 0.25);
 	glm::vec3  at(0.0, 0.0, 0.0);
 	glm::vec3  up(0.0, 1.0, 0.0);
 	view = glm::lookAt(eye, at, up);
