@@ -23,9 +23,9 @@ nN = normalize(N);
 nL = normalize(L);
 
 //Lambert's cosine law
-float lambertTerm = dot(nN,-nL);
+float lambertTerm = dot(nN,nL);
 
-float Kd = max (dot (nN, -nL) , 0.0);
+float Kd = max (dot (nN, nL) , 0.0);
 //Ambient Term
 vec4 Ia = lightAmbient * materialAmbient;
 

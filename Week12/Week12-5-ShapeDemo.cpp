@@ -146,11 +146,11 @@ void loadTexture()
 void setupLight()
 {
 	// Setting ambient Light.
-	glUniform3f(glGetUniformLocation(program, "aLight.ambientcolor"), aLight.ambientcolor.x, aLight.ambientcolor.y, aLight.ambientcolor.z);
+	glUniform3f(glGetUniformLocation(program, "aLight.ambientcolor"), aLight.ambientColor.x, aLight.ambientColor.y, aLight.ambientColor.z);
 	glUniform1f(glGetUniformLocation(program, "aLight.ambientStrength"), aLight.ambientStrength);
 
 	// Setting directional light.
-	glUniform3f(glGetUniformLocation(program, "dLight.base.diffusecolor"), dLight.diffusecolor.x, dLight.diffusecolor.y, dLight.diffusecolor.z);
+	glUniform3f(glGetUniformLocation(program, "dLight.base.diffusecolor"), dLight.diffuseColor.x, dLight.diffuseColor.y, dLight.diffuseColor.z);
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
 
 	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);

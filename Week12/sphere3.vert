@@ -40,9 +40,9 @@ void main()
  else L = normalize( lightPosition.xyz - pos );
 
  //Lambert's cosine law
- float lambertTerm = dot(N,-L);
+ float lambertTerm = dot(N,L);
 
- float Kd = max (dot (N, -L) , 0.0);
+ float Kd = max (dot (N, L) , 0.0);
 
  //Ambient Term
  vec4 Ia = lightAmbient * materialAmbient;

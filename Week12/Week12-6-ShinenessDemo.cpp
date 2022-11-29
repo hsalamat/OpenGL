@@ -88,7 +88,7 @@ void timer(int);
 
 void resetView()
 {
-	position = glm::vec3(-15.0f, 2.0f, 5.0f);
+	position = glm::vec3(-10.0f, 0.0f, 0.0f);
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
@@ -149,11 +149,11 @@ void loadTexture()
 void setupLight()
 {
 	// Setting ambient Light.
-	glUniform3f(glGetUniformLocation(program, "aLight.ambientcolor"), aLight.ambientcolor.x, aLight.ambientcolor.y, aLight.ambientcolor.z);
+	glUniform3f(glGetUniformLocation(program, "aLight.ambientcolor"), aLight.ambientColor.x, aLight.ambientColor.y, aLight.ambientColor.z);
 	glUniform1f(glGetUniformLocation(program, "aLight.ambientStrength"), aLight.ambientStrength);
 
 	// Setting directional light.
-	glUniform3f(glGetUniformLocation(program, "dLight.base.diffusecolor"), dLight.diffusecolor.x, dLight.diffusecolor.y, dLight.diffusecolor.z);
+	glUniform3f(glGetUniformLocation(program, "dLight.base.diffusecolor"), dLight.diffuseColor.x, dLight.diffuseColor.y, dLight.diffuseColor.z);
 	glUniform1f(glGetUniformLocation(program, "dLight.base.diffuseStrength"), dLight.diffuseStrength);
 
 	glUniform3f(glGetUniformLocation(program, "dLight.direction"), dLight.direction.x, dLight.direction.y, dLight.direction.z);
@@ -234,6 +234,7 @@ void calculateView()
 	View = glm::lookAt(
 		position, // Camera position
 		position + frontVec, // Look target
+		//glm::vec3(0,0,0),
 		upVec); // Up vector
 	glUniform3f(glGetUniformLocation(program, "eyePosition"), position.x, position.y, position.z);
 }
@@ -267,22 +268,22 @@ void display(void)
 	// Draw all shapes.
 
 	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(15.0f, -5.0f, 30.0f));
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(30.0f, -10.0f, 5.0f));
 	g_grid.DrawShape(GL_LINE_STRIP);
 
 	angle += -2.0;
 
 	angle += -2.0;
 	//Sphere.
-	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, angle, glm::vec3(6.0f, 2.0f, 0.0f));
+	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	g_sphere.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, leafTexture);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(0.0f, 2.0f, 2.0f));
+	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, 0.0f, glm::vec3(0.0f, -1.0f, 0.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, metalTexture);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(0.0f, 1.0f, 2.0f));
+	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, 0.0f, glm::vec3(1.0f, -1.0f, -1.0f));
 	g_prism.DrawShape(GL_TRIANGLES);
 
 	glBindTexture(GL_TEXTURE_2D, 0);

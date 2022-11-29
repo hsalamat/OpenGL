@@ -1,5 +1,6 @@
 #pragma once
-
+#include "glm\glm.hpp"
+#include <GL/glew.h>
 #include <iostream>
 #include <vector>
 #include <cmath>

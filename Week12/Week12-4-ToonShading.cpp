@@ -51,7 +51,7 @@ int  colorIndex = 0;
 
 //glm::vec4 lightDirection = glm::vec4(0.0f, -1.0f, -1.0f,0.0f);
 
-glm::vec4 lightPosition = glm::vec4(0.0f, -1.0f, -1.0f, 1.0f);
+glm::vec4 lightPosition = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
 glm::vec4 lightAmbient = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 glm::vec4 lightDiffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0);
 glm::vec4 lightSpecular = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
