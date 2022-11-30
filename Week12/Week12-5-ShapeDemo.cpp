@@ -126,7 +126,7 @@ void loadTexture()
 
 	// Second texture. Blank one.
 
-	unsigned char* image2 = stbi_load("Media/bodyMetal.bmp", &width, &height, &bitDepth, 0);
+	unsigned char* image2 = stbi_load("Media/Water02.jpg", &width, &height, &bitDepth, 0);
 	if (!image2) cout << "Unable to load file!" << endl;
 
 	glGenTextures(1, &metalTexture);
@@ -262,6 +262,7 @@ void display(void)
 
 	angle += -2.0;
 	//Sphere.
+	glBindTexture(GL_TEXTURE_2D, metalTexture);
 	transformObject(glm::vec3(0.5f, 0.5f, 0.5f), Y_AXIS, angle, glm::vec3(6.0f, 2.0f, 0.0f));
 	g_sphere.DrawShape(GL_TRIANGLES);
 

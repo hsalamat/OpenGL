@@ -162,17 +162,19 @@ struct Sphere : public Shape
 			shape_indices.push_back(i);
 		}
 
-		for (int i = 0; i < shape_vertices.size(); i ++)
+		ColorShape(1.0f, 1.0f, 0.0f);
+
+		for (int i = 0; i < shape_vertices.size(); i += 3)
 		{
 			shape_uvs.push_back(0); 
 			shape_uvs.push_back(0);
+			shape_uvs.push_back(1);
 			shape_uvs.push_back(0);
 			shape_uvs.push_back(1);
 			shape_uvs.push_back(1);
-			shape_uvs.push_back(0);
 		}
 		
-		ColorShape(1.0f, 1.0f, 0.0f);
+		
 	}
 
 	void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
