@@ -166,10 +166,10 @@ struct Sphere : public Shape
 		{
 			shape_uvs.push_back(0);
 			shape_uvs.push_back(0);
+			shape_uvs.push_back(1);
 			shape_uvs.push_back(0);
 			shape_uvs.push_back(1);
 			shape_uvs.push_back(1);
-			shape_uvs.push_back(0);
 		}
 
 		ColorShape(1.0f, 1.0f, 0.0f);
