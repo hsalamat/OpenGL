@@ -75,7 +75,7 @@ AmbientLight aLight(
 	0.1f);							// Diffuse strength.
 
 DirectionalLight dLight(
-	glm::vec3(0.0f, 1.0f, 0.0f),	// direction.using the origin
+	glm::vec3(0.0f, 1.0f, 1.0f),	// direction.using the origin
   //directionalLightPosition,
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
 	1.0f);							// Diffuse strength.
@@ -91,7 +91,7 @@ int lastX, lastY;
 // Geometry data.
 Grid g_grid(16);
 //Cube g_cube;
-Cube2 g_cube(0.5f,0.5f,0.5f);
+Cube2 g_cube(2.0f,2.0f,2.0f);
 Prism g_prism(7);
 Sphere g_sphere(5);
 
@@ -99,6 +99,7 @@ void timer(int); // Prototype.
 
 Texture* pTexture = NULL;
 Texture* blankTexture = NULL;
+Texture* myTexture = NULL;
 GLuint textureID;
 
 void resetView()
@@ -140,6 +141,10 @@ void loadTextures()
 	blankTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
 	blankTexture->Bind(GL_TEXTURE0);
 	blankTexture->Load();
+
+	myTexture = new Texture(GL_TEXTURE_2D, "Media/stickman.jpg", GL_RGB);
+	myTexture->Bind(GL_TEXTURE0);
+	myTexture->Load();
 
 }
 
@@ -295,9 +300,9 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Cube.
-	pTexture->Bind(GL_TEXTURE0);
+	myTexture->Bind(GL_TEXTURE0);
 	g_cube.RecolorShape(0.0, 1.0, 1.0);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
+	transformObject(glm::vec3(2.0f, 2.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
