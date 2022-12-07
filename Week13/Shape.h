@@ -410,6 +410,101 @@ struct Cube : public Shape
 	}
 };
 
+struct Cube2 : public Shape
+{
+	Cube2(GLfloat x = 1, GLfloat y = 1, GLfloat z = 1)
+	{
+		shape_indices = {
+			// Front.
+			0, 1, 2,
+			2, 3, 0,
+			// Right.
+			4, 5, 6,
+			6, 7, 4,
+			// Back.
+			8, 9, 10,
+			10, 11, 8,
+			// Left.
+			12, 13, 14,
+			14, 15, 12,
+			// Top.
+			16, 17, 18,
+			18, 19, 16,
+			// Bottom.
+			20, 21, 22,
+			22, 23, 20
+		};
+		shape_vertices = {
+			// Front.
+			0.0f, 0.0f, 1.0f,		// 0.
+			1.0f, 0.0f, 1.0f,		// 1.
+			1.0f, 1.0f, 1.0f,		// 2.
+			0.0f, 1.0f, 1.0f,		// 3.
+			// Right.
+			1.0f, 0.0f, 1.0f,		// 1. 4
+			1.0f, 0.0f, 0.0f,		// 5. 5
+			1.0f, 1.0f, 0.0f,		// 6. 6
+			1.0f, 1.0f, 1.0f,		// 2. 7
+			// Back.
+			1.0f, 0.0f, 0.0f,		// 5. 8
+			0.0f, 0.0f, 0.0f,		// 4. 9
+			0.0f, 1.0f, 0.0f,		// 7. 10
+			1.0f, 1.0f, 0.0f,		// 6. 11
+			// Left.
+			0.0f, 0.0f, 0.0f,		// 4. 12
+			0.0f, 0.0f, 1.0f,		// 0. 13
+			0.0f, 1.0f, 1.0f,		// 3. 14
+			0.0f, 1.0f, 0.0f,		// 7. 15
+			// Top.
+			0.0f, 1.0f, 0.0f,		// 7. 16
+			0.0f, 1.0f, 1.0f,		// 3. 17
+			1.0f, 1.0f, 1.0f,		// 2. 18
+			1.0f, 1.0f, 0.0f,		// 6. 19
+			// Bottom.
+			0.0f, 0.0f, 0.0f,		// 4. 20
+			1.0f, 0.0f, 0.0f,		// 5. 21
+			1.0f, 0.0f, 1.0f,		// 1. 22
+			0.0f, 0.0f, 1.0f		// 0. 23
+		};
+		shape_uvs = {
+			// Front.
+			0.0f, 0.0f, 	// 0.
+			x, 0.0f, 	// 1.
+			x, y, 	// 2.
+			0, y,		// 3.
+			// Right.
+			0.0f, 0.0f, 	// 1.
+			z, 0.0f, 	// 5.
+			z,y, 	// 6.
+			0.0f, y,		// 2.
+			// Back.
+			0.0f, 0.0f, 	// 5.
+			x,0, 	// 4.
+			x,y,		// 7.
+			0.0f, y,		// 6.
+			// Left.
+			0.0f, 0.0f,		// 4.
+			z, 0.0f,		// 0.
+			z,y,		// 3.
+			0.0f, y,		// 7.
+			// Top.
+			0.0f, z,		// 7.
+			0,0,		// 3.
+			x, 0,		// 2.
+			x,z,		// 6.
+			// Bottom.
+			0.0f, 0.0f,		// 4.
+			x,0,		// 5.
+			x,z,		// 1.
+			0,z		// 0.
+		};
+		/*for (unsigned i = 0; i < shape_uvs.size(); i++)
+			shape_uvs[i] *= scale;*/
+		ColorShape(1.0f, 1.0f, 1.0f);
+		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
+	}
+};
+
 struct Prism : public Shape
 {
 	Prism(int sides)

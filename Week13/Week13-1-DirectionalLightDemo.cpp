@@ -90,7 +90,8 @@ int lastX, lastY;
 
 // Geometry data.
 Grid g_grid(16);
-Cube g_cube;
+//Cube g_cube;
+Cube2 g_cube(0.5f,0.5f,0.5f);
 Prism g_prism(7);
 Sphere g_sphere(5);
 
