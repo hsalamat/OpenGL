@@ -101,7 +101,8 @@ void display(void)
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-	glFlush(); // Instead of double buffering.
+	//glFlush(); // Instead of double buffering.
+	glutSwapBuffers();
 }
 
 void idle()
@@ -117,7 +118,7 @@ void idle()
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Triangles");
 

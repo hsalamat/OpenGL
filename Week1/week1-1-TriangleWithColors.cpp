@@ -16,8 +16,8 @@
 // If the fragment shader does not explicitly requests that variable(and you can mix and match multiple fragment shaders with the same vertex shader) 
 // then a common driver optimization will be to drop any instructions in the VS that only affect this variable
 // (for that particular shader program that combines this VSand FS pair).
-// However, if the FS does use that variable the rasterizer interpolates it during rasterizationand 
-// each FS invocation is provided a the interpolated value that matches that specific location.
+// However, if the FS does use that variable the rasterizer interpolates it during rasterization and 
+// each FS invocation is provided as the interpolated value that matches that specific location.
 // This usually means that the values for pixels that are right next to each other will be a 
 // bit different(though as the triangle becomes further and further away from the camera 
 // that becomes less likely).
@@ -49,7 +49,8 @@ GLfloat vertices[NumVertices][2] = {
 };
 
 
-//const is a contract. By receiving a const int * parameter, you "tell" the caller that you (the called function) will not modify the objects the pointer points to.
+//const is a contract. By receiving a const int * parameter, 
+// you "tell" the caller that you (the called function) will not modify the objects the pointer points to.
 //const can also be used by compiler to perform optimization it couldn't otherwise
 //void * is used in C for "generic" data
 

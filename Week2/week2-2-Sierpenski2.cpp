@@ -102,7 +102,8 @@ display(void)
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_POINTS, 0, NumVertices);
 
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
 }
 
 void idle()
@@ -118,7 +119,7 @@ void idle()
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Sierpenski2");
 

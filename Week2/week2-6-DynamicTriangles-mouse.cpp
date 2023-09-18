@@ -114,7 +114,8 @@ void display(void)
 
 	//glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-	glFlush(); // Instead of double buffering.
+	//glFlush(); // Instead of double buffering.
+	glutSwapBuffers();
 }
 
 void idle()
@@ -171,7 +172,7 @@ void myKey(unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(w, h);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("Dynamic Triangle");

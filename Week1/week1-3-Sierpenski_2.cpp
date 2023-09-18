@@ -3,6 +3,31 @@
 //
 // Sierpenski_2.cpp
 // Load the vertices in initialization step
+// 
+// In previous algorithm, we compute all the points first and put them into an array or
+//some other data structure.We then display all the points through a single function
+//call.This approach avoids the overhead of sending small amounts of data to the
+//graphics processor for each point we generate at the cost of having to store all the
+//data.The strategy used in the first algorithm is known as immediatemode graphics
+//and, until recently, was the standard method for displaying graphics, especially where
+//interactive performance was needed.One consequence of immediate mode is that
+//there is no memory of the geometric data.With our first example, if we want to
+//display the points again, we would have to go through the entire creation and display
+//process a second time.
+// 
+// In the following algorithm, because the data are stored in a data structure, we can
+//redisplay the data, perhaps with some changes such as altering the color or changing
+//the size of a displayed point, by resending the array without regenerating the points.
+//The method of operation is known as retained mode graphics and goes back to some
+//of the earliest special purpose graphics display hardware.The architecture of modern
+//graphics systems that employ a GPU leads to a third version of our program.
+//Our second approach has one major flaw.Suppose that, as we might in an
+//animation, we wish to redisplay the same objects.The geometry of the objects is
+//unchanged, but the objects may bemoving.Displaying all the points involves sending
+//the data from the CPU to the GPU each time we wish to display the objects in a new
+//position.For large amounts of data, this data transfer is the major bottleneck in the
+//display process.
+// 
 //Notice we moved glBufferData in the init() function when Pushing the coordinates of the vertices into the buffer
 //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 //why? becuase the coordinates are not changing!
@@ -99,7 +124,8 @@ display(void)
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_POINTS, 0, NumVertices);
 
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
 }
 
 
@@ -130,7 +156,8 @@ int main(int argc, char** argv)
 {
 	//Before we can open a window, theremust be interaction between the windowing systemand OpenGL.In GLUT, this interaction is initiated by the following function call :
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	//glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
 	//if you comment out this line, a window is created with a default size
 	glutInitWindowSize(512, 512);

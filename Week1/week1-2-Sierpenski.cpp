@@ -2,7 +2,20 @@
 ///////////////////////////////////////////////////////////////////////
 //
 // Sierpenski.cpp
-//
+// We will use as a sample problem the drawing of the Sierpinski gasket—an interesting
+// shape that has a long history and is of interest in areas such as fractal geometry.
+// Suppose that we start with three points in space. As long as the points are not
+//collinear, they are the vertices of a unique triangle and also define a unique plane.
+//We assume that this plane is the plane z = 0 and that these points, as specified in
+// some convenient coordinate system,1 are (x1, y1, 0), (x2, y2, 0), and (x3, y3, 0). The
+//construction proceeds as follows :
+//1. Pick an initial point p = (x, y, 0) at random inside the triangle.
+//2. Select one of the three vertices at random.
+//3. Find the point q halfway between p and the randomly selected vertex.
+//4. Display q by putting some sort of marker, such as a small circle, at the corresponding
+//location on the display.
+//5. Replace p with q.
+//6. Return to step 2.
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -109,7 +122,9 @@ display(void)
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_POINTS, 0, NumVertices);
 
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
+
 }
 
 
@@ -140,7 +155,8 @@ int main(int argc, char** argv)
 {
 	//Before we can open a window, theremust be interaction between the windowing systemand OpenGL.In GLUT, this interaction is initiated by the following function call :
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	//glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
 	//if you comment out this line, a window is created with a default size
 	glutInitWindowSize(512, 512);

@@ -90,8 +90,10 @@ display(void)
 	//Ordering the GPU to start the pipeline
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-	glFlush();
+	//glFlush();
+	glutSwapBuffers();
 }
+
 
 void idle()
 {
@@ -120,7 +122,8 @@ int main(int argc, char** argv)
 {
 	//Before we can open a window, theremust be interaction between the windowing systemand OpenGL.In GLUT, this interaction is initiated by the following function call :
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	//glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
 	//if you comment out this line, a window is created with a default size
 	glutInitWindowSize(512, 512);

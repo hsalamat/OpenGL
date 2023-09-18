@@ -224,7 +224,9 @@ display(void)
 
 	//The glFlush ensures that all the data are rendered as soon as possible.If you leave it out,
 	//the program should work correctly, but you notice a delay in a busy or networked environment.
-	glFlush();
+	//glFlush();
+
+	glutSwapBuffers();
 }
 
 void idle()
@@ -240,7 +242,7 @@ void idle()
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("tetrahedron3");
