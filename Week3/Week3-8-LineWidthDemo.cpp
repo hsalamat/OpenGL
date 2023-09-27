@@ -1,9 +1,9 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// Cube.cpp
-// Making Cube using GL_TRIANGLES
-///////////////////////////////////////////////////////////////////////
+/** @file Week3-8-LineWidthDemo.cpp
+ *  @brief glLineWith Demo
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 
@@ -32,38 +32,34 @@ GLuint Buffers[1];
 GLuint vao, ibo, points_vbo, colors_vbo, modelID;
 float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
+int w = 512, h = 512;
+int counter = 0;
 
 GLshort cube_indices[] = {
-	// Front.
-	0, 1, 2,
-	2, 3, 0,
+
 	// Left.
-	0, 4, 7,
-	7, 3, 0,
-	// Right.
-	2, 1, 5,
-	5, 6, 1,
+	0, 3, 7, 4,
 	// Bottom.
-	0, 1, 5,
-	5, 4, 1,
+	4, 0, 1, 5,
+	// Right.
+	5, 1, 2, 6,
 	// Back.
-	4, 5, 6,
-	6, 7, 4,
+	6, 5, 4, 7,
 	// Top.
-	2, 6, 7,
-	7, 3, 2
+	7, 6, 2, 3,
+	// Front.
+	3, 2, 1, 0,
 };
 
 GLfloat cube_vertices[] = {
-		-0.5, -0.5, 0.5, //0
-		0.5, -0.5, 0.5, //1
-		0.5, 0.5, 0.5, //2
-		-0.5, 0.5, 0.5, //3
-		
-		-0.5, -0.5, -0.5, //4
-		0.5, -0.5, -0.5, //5
-		0.5, 0.5, -0.5, //6
-		-0.5, 0.5, -0.5, //7
+	-0.9f, -0.9f, 0.9f,		// 0.
+	0.9f, -0.9f, 0.9f,		// 1.
+	0.9f, 0.9f, 0.9f,		// 2.
+	-0.9f, 0.9f, 0.9f,		// 3.
+	-0.9f, -0.9f, -0.9f,	// 4.
+	0.9f, -0.9f, -0.9f,		// 5.
+	0.9f, 0.9f, -0.9f,		// 6.
+	-0.9f, 0.9f, -0.9f,		// 7.
 };
 
 GLfloat colors[] = {
@@ -77,29 +73,17 @@ GLfloat colors[] = {
 	0.0f, 0.5f, 0.0f
 };
 
-GLfloat edges[] = {
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
-0.0f, 1.0f, 0.0f,
+
+GLfloat colors1[] = {
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
 };
-
-//GLfloat colors[] = {
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//1.0f, 0.0f, 0.0f,
-//};
-
-
 
 static unsigned int
 program,
@@ -122,7 +106,7 @@ void init(void)
 
 	modelID = glGetUniformLocation(program, "model");
 
-	vao = 0;
+	vao = 1;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -130,22 +114,25 @@ void init(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
-	points_vbo = 0;
+	points_vbo = 1;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	colors_vbo = 0;
+	colors_vbo = 2;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
+
+	vao = 2;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -153,26 +140,28 @@ void init(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
+	points_vbo = 3;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), cube_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
+	colors_vbo = 4;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), edges, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
 	// Enable depth test.
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
+	//glFrontFace(GL_CW);
 	//glCullFace(GL_BACK);
 }
 
@@ -198,29 +187,76 @@ void transformObject(float scale, glm::vec3 rotationAxis, float rotationAngle, g
 void display(void)
 {
 
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(1);
 
-	transformObject(0.5f, YZ_AXIS, (float)45, glm::vec3(0.0f, 0.0f, 0.0f));
+	//counter += 0.1f;
+	transformObject(0.5f, YZ_AXIS, counter++, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
-	glBindVertexArray(0);
+	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(2);
 	glLineWidth(5);
-	glDrawElements(GL_LINE_STRIP, 36, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_LINE_LOOP, 24, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
-	glutSwapBuffers(); // Now for a potentially smoother render.
+	glutSwapBuffers(); // Instead of double buffering.
 }
 
 void idle()
 {
-	//glutPostRedisplay();
+	glutPostRedisplay();
+	//display();
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		//exit(0);
+	}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+
+	}
+}
+
+void myKey(unsigned char key, int x, int y)
+{
+	if (key == 'q' || key == 'Q') exit(0);
+	//if (key == 's' ) glutIdleFunc(NULL);
+}
+//---------------------------------------------------------------------
+//
+// main
+//
+
+//Using menus involves taking a few simple steps.We must specify the actions
+//corresponding to each entry in the menu.We must link the menu to a particular
+//mouse button.Finally, we must register a callback function for each menu.We can
+//demonstrate simple menus with the example of a pop - up menu that has three entries.
+//The first selection allows us to exit our program.The second and third start and stop
+//the rotation.The function calls to set up the menu and to link it to the right mouse
+//button should be placed in our main function.
+
+void demo_menu(int id)
+{
+	switch (id)
+	{
+	case 1:
+		exit(0);
+		break;
+	case 2:
+		glutIdleFunc(idle);
+		break;
+	case 3:
+		glutIdleFunc(NULL);
+		break;
+	}
+	glutPostRedisplay();
 }
 
 //---------------------------------------------------------------------
@@ -231,9 +267,18 @@ void idle()
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
-	glutInitWindowSize(1024, 1024);
-	glutCreateWindow("Cube Tranformation");
+	//Note that the default in GLUT is equivalent to using GLUT_SINGLE rather than GLUT_DOUBLE.
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize(w, h);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Automation Animation Cube");
+
+	glutCreateMenu(demo_menu);
+	glutAddMenuEntry("quit", 1);
+	glutAddMenuEntry("start rotation", 2);
+	glutAddMenuEntry("stop rotation", 3);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 
@@ -241,7 +286,18 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(display);
 
+	//We register the mouse callback function, usually in the main function, by means of the GLUT function
+	glutMouseFunc(mouse);
+
+	//When a keyboard event occurs, the ASCII code for the key that generated the
+	//event and the location of the mouse are returned.All the key - press callbacks are
+	//registered in a single callback function, such as
+	glutKeyboardFunc(myKey);
+
 	glutIdleFunc(idle);
 
+
 	glutMainLoop();
+
+
 }

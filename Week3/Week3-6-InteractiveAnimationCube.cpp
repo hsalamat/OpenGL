@@ -1,10 +1,12 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// InteractiveAnimation.cpp
-//Interactively, via keyboard or mouse input, with the help of their callback routines 
-//to invoke transformations.
-///////////////////////////////////////////////////////////////////////
+/** @file Week3-6-InteractiveAnimationCube.cpp
+ *  @brief Interactive Animation Demo
+ *
+ *  Interactively, via keyboard or mouse input, with the help of their callback routines
+ *  to invoke transformations.
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 

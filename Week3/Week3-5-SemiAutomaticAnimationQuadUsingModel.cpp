@@ -1,10 +1,15 @@
-//Semi-automatic animation: we call a routine timer function, called the timer function, 
-//with a call to glutTimerFunc(period, timer function, value). 
-//The timer function is called period milliseconds after the glutTimerFunc() statement is executed 
-//and with the parameter value being passed to it.
-//In this Demo, if users key in the escape button or rigth mouse button, the application stops
-
-
+/** @file Week3-5-SemiAutomaticAnimationQuadUsingModel.cpp
+ *  @brief Semi-Automatic Animation Demo
+ *
+ *  Semi-automatic animation: we call a routine timer function, called the timer function,
+ *  with a call to glutTimerFunc(period, timer function, value).
+ *  The timer function is called period milliseconds after the glutTimerFunc() statement is executed
+ *  and with the parameter value being passed to it.
+ *  In this Demo, all the movement actually happens in the GPU!
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 

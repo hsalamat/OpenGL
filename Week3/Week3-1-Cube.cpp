@@ -1,9 +1,12 @@
+/** @file Week3-1-Cube.cpp
+ *  @brief Cube Demo
+ *
+ *  Making Cube using GL_TRIANGLES
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
-///////////////////////////////////////////////////////////////////////
-//
-// Cube.cpp
-// Making Cube using GL_TRIANGLES
-///////////////////////////////////////////////////////////////////////
 
 using namespace std;
 
@@ -33,26 +36,49 @@ GLuint vao, ibo, points_vbo, colors_vbo, modelID;
 float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
 
+//GLshort cube_indices[] = {
+//	// Front.
+//	2, 1, 0,
+//	0, 3, 2,
+//	// Left.
+//	3, 0, 4,
+//	4, 7, 3,
+//	// Bottom.
+//	0, 1, 5,
+//	5, 4, 0,
+//	// Right.
+//	1, 2, 6,
+//	6, 5, 1,
+//	// Back.
+//	5, 6, 7,
+//	7, 4, 5,
+//	// Top.
+//	6, 2, 3,
+//	3, 7, 6
+//};
+
+
 GLshort cube_indices[] = {
 	// Front.
-	2, 1, 0,
-	0, 3, 2,
+	0, 1, 2,
+	2, 3, 0,
 	// Left.
-	3, 0, 4,
-	4, 7, 3,
+	0, 3, 7,
+	7, 4, 0,
 	// Bottom.
-	0, 1, 5,
-	5, 4, 0,
+	0, 4, 5,
+	5, 1, 0,
 	// Right.
-	1, 2, 6,
-	6, 5, 1,
+	5, 6, 2,
+	2, 1, 5,
 	// Back.
-	5, 6, 7,
-	7, 4, 5,
+	5, 4, 7,
+	7, 6, 5,
 	// Top.
-	6, 2, 3,
-	3, 7, 6
+	3, 2, 6,
+	6, 7, 3
 };
+
 
 GLfloat cube_vertices[] = {
 	-0.9f, -0.9f, 0.9f,		// 0.
@@ -74,6 +100,34 @@ GLfloat colors[] = {
 	0.0f, 1.0f, 1.0f,
 	0.5f, 0.0f, 0.0f,
 	0.0f, 0.5f, 0.0f
+};
+
+
+GLshort quad_indices[] = {
+	// Front.
+	0, 1, 2, 3,
+	// Left.
+	0, 3, 7, 4,
+	// Bottom.
+	0, 4, 5, 1, 
+	// Right.
+	5, 6, 2, 1, 
+	// Back.
+	5, 4, 7, 6, 
+	// Top.
+	3, 2, 6, 7, 
+};
+
+
+GLfloat colors1[] = {
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
 };
 
 
@@ -99,7 +153,7 @@ void init(void)
 
 	modelID = glGetUniformLocation(program, "model");
 
-	vao = 0;
+	vao = 1;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -107,14 +161,14 @@ void init(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
-	points_vbo = 0;
+	points_vbo = 1;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	colors_vbo = 0;
+	colors_vbo = 2;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
@@ -123,6 +177,33 @@ void init(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+
+
+	vao = 2;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quad_indices), quad_indices, GL_STATIC_DRAW);
+
+	points_vbo = 3;
+	glGenBuffers(1, &points_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
+
+	colors_vbo = 4;
+	glGenBuffers(1, &colors_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
+	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+
 
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
@@ -157,7 +238,7 @@ void display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(1);
 
 	transformObject(0.5f, YZ_AXIS, (float)45, glm::vec3(0.0f, 0.0f, 0.0f));
 	//transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)90 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -166,7 +247,9 @@ void display(void)
 	//glDrawArrays(GL_TRIANGLES, 0, 8);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0); // Try GL_LINE_STRIP too!
 	
-	//glDrawElements(GL_LINE_STRIP, 36, GL_UNSIGNED_SHORT, 0);
+
+	glBindVertexArray(2);
+	glDrawElements(GL_LINE_LOOP, 24, GL_UNSIGNED_SHORT, 0);
 	
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -175,7 +258,7 @@ void display(void)
 
 void idle()
 {
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 //---------------------------------------------------------------------

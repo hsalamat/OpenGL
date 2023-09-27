@@ -1,12 +1,15 @@
+/** @file Week3-9-InteractiveAnimationCircle.cpp
+ *  @brief Interactive Animation Demo
+ *
+ *  Interactively, via keyboard or mouse input, with the help of their callback routines 
+ *  to invoke transformations.
+ *  Press + and - to increase and decrease the edges so they look like a circle
+ *  Press left/middle/right mouse button to rotate around x, y, or z axes
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
-///////////////////////////////////////////////////////////////////////
-//
-// InteractiveAnimation Circle
-//Interactively, via keyboard or mouse input, with the help of their callback routines 
-//to invoke transformations.
-// Press + and - to increase and decrease the edges so they look like a circle
-// Press left/middle/right mouse button to rotate around x, y, or z axis
-///////////////////////////////////////////////////////////////////////
 
 using namespace std;
 

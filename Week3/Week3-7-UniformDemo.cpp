@@ -1,13 +1,15 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// UniformDemo.cpp
-//In the application, we can use GLUT to get the elapsed time in milliseconds
-//float etime;
-//etime = 0.001 * glutGet(GLUT_ELAPSED_TIME);
-//In the vertex shader, we might have a corresponding variable time.For example, the
-//our new "cub2.vert" vertex shader varies the x component of each vertex sinusoidally
-///////////////////////////////////////////////////////////////////////
+/** @file Week3-7-UniformDemo.cpp
+ *  @brief Uniform Demo
+ *
+ *  In the application, we can use GLUT to get the elapsed time in milliseconds
+ *  float etime;
+ *  etime = 0.001 * glutGet(GLUT_ELAPSED_TIME);
+ *  In the vertex shader, we might have a corresponding variable time.For example, the
+ *  our new "cub2.vert" vertex shader varies the x component of each vertex sinusoidally
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 
@@ -164,7 +166,7 @@ void display(void)
 
 	glBindVertexArray(vao);
 
-	transformObject(0.5f, YZ_AXIS, (float)45, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(0.3f, YZ_AXIS, (float)45, glm::vec3(0.0f, 0.0f, 0.0f));
 	//transformObject(0.4f, YZ_AXIS, rotAngle -= ((float)90 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	etime = 0.001 * glutGet(GLUT_ELAPSED_TIME);

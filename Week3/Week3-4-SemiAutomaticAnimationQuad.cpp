@@ -1,16 +1,15 @@
-//Semi-automatic animation: we call a routine timer function, called the timer function, 
-//with a call to glutTimerFunc(period, timer function, value). 
-//The timer function is called period milliseconds after the glutTimerFunc() statement is executed 
-//and with the parameter value being passed to it.
-//In this Demo, if users key in the escape button or rigth mouse button, the application stops
-
-
-///////////////////////////////////////////////////////////////////////
-//
-// triangles.cpp
-//
-///////////////////////////////////////////////////////////////////////
-
+/** @file Week3-4-SemiAutomaticAnimationQuad.cpp
+ *  @brief Semi-Automatic Animation Demo
+ *
+ *  Semi-automatic animation: we call a routine timer function, called the timer function,
+ *  with a call to glutTimerFunc(period, timer function, value).
+ *  The timer function is called period milliseconds after the glutTimerFunc() statement is executed
+ *  and with the parameter value being passed to it.
+ *  In this Demo, quad moves to left and right without user intervention.
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 
@@ -131,7 +130,7 @@ void idle()
 void timer(int)
 {
 	glutPostRedisplay(); //call the drawScene
-	glutTimerFunc(1000 / 30, timer, 0); //ine one second, this function calls itself 60 times
+	glutTimerFunc(1000 / 30, timer, 0); //ine one second, this function calls itself 30 times
 
 	switch (direction)
 	{

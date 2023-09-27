@@ -1,12 +1,22 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// AutomaticAnimation.cpp
-//In Automatic Animation, We call a function called the idle function, 
-//with the statement glutIdleFunc(idle function).
-//The idle function is called whenever no OpenGL event is otherwise pending.
-//  Note: I am making Cube using GL_QUADS
-///////////////////////////////////////////////////////////////////////
+/** @file Week3-2-AutomaticAnimationCube.cpp
+ *  @brief Automatic Animation Demo
+ *
+ *  In Automatic Animation, We call a function called the idle function,
+ *  with the statement glutIdleFunc(idle function).
+ *  The idle function is called whenever no OpenGL event is otherwise pending.
+ *  Using menus involves taking a few simple steps.We must specify the actions
+ *  corresponding to each entry in the menu.We must link the menu to a particular
+ *  mouse button.Finally, we must register a callback function for each menu.We can
+ *  demonstrate simple menus with the example of a pop - up menu that has three entries.
+ *  The first selection allows us to exit our program.The second and third start and stop
+ *  the rotation.The function calls to set up the menu and to link it to the right mouse
+ *  button should be placed in our main function.
+ * 
+ *  @attention we am making Cube using GL_QUADS
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 using namespace std;
 
@@ -76,6 +86,18 @@ GLfloat colors[] = {
 	0.0f, 0.5f, 0.0f
 };
 
+
+GLfloat colors1[] = {
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+};
+
 static unsigned int
 program,
 vertexShaderId,
@@ -97,7 +119,7 @@ void init(void)
 
 	modelID = glGetUniformLocation(program, "model");
 
-	vao = 0;
+	vao = 1;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -105,14 +127,14 @@ void init(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
 
-	points_vbo = 0;
+	points_vbo = 1;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
-	colors_vbo = 0;
+	colors_vbo = 2;
 	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
@@ -122,8 +144,38 @@ void init(void)
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
+
+	vao = 2;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
+
+	points_vbo = 3;
+	glGenBuffers(1, &points_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
+
+	colors_vbo = 4;
+	glGenBuffers(1, &colors_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Can optionally unbind the buffer to avoid modification.
+
+	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
+
 	// Enable depth test.
 	glEnable(GL_DEPTH_TEST);
+
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CW);
+	//glCullFace(GL_BACK);
 }
 
 //---------------------------------------------------------------------
@@ -150,14 +202,16 @@ void display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(1);
 
 	//counter += 0.1f;
 	transformObject(0.5f, YZ_AXIS, counter++, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
 	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_SHORT, 0);
-	//glDrawElements(GL_LINE_LOOP, 24, GL_UNSIGNED_SHORT, 0);
+
+	glBindVertexArray(2);
+	glDrawElements(GL_LINE_LOOP, 24, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -187,18 +241,7 @@ void myKey(unsigned char key, int x, int y)
 	if (key == 'q' || key == 'Q') exit(0);
 	//if (key == 's' ) glutIdleFunc(NULL);
 }
-//---------------------------------------------------------------------
-//
-// main
-//
 
-//Using menus involves taking a few simple steps.We must specify the actions
-//corresponding to each entry in the menu.We must link the menu to a particular
-//mouse button.Finally, we must register a callback function for each menu.We can
-//demonstrate simple menus with the example of a pop - up menu that has three entries.
-//The first selection allows us to exit our program.The second and third start and stop
-//the rotation.The function calls to set up the menu and to link it to the right mouse
-//button should be placed in our main function.
 
 void demo_menu(int id)
 {
