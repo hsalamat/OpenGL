@@ -1,12 +1,9 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// SquareOfWalls.cpp
-//shows four rectangular walls enclosing a square space.
-//The front faces(the outside of the walls) are filled
-//the back faces(the inside) are wireframed
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week5-4-Sphere.cpp
+ *  @brief how to create a sphere by subdiving triangle and normalizing their length.
+ *
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 
 #include <iostream>
@@ -94,7 +91,7 @@ void divide_triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, int k)
 	if (k > 0)
 	{
 		// compute midpoints of sides
-	glm::vec3 ab = glm::normalize((a + b) / 2.0f);
+		glm::vec3 ab = glm::normalize((a + b) / 2.0f);
 		glm::vec3 ac = glm::normalize((a + c) / 2.0f);
 		glm::vec3 bc = glm::normalize((b + c) / 2.0f);
 		//glm::vec3 ab = (a + b) / 2.0f;

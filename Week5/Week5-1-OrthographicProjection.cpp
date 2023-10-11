@@ -1,9 +1,11 @@
 
-///////////////////////////////////////////////////////////////////////
-//
-// OrthographicsProjection.cpp
-//
-///////////////////////////////////////////////////////////////////////
+/** @file Week5-1-OrthographicProjection.cpp
+ *  @brief OrthographicProjection
+ *  
+ *  @note press WASDQE
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 
 #include <iostream>
@@ -32,6 +34,9 @@ int deltaTime, currentTime, lastTime = 0;
 float osH = 0.0f, osV = 0.0f, osZ= 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mvp, view, projection;
+
+GLfloat  aspect = 4.0f / 3.0f;       // Viewport aspect ratio --> reshape function gets called which sets the aspect ratio correctly!
+
 
 static unsigned int
 program,
@@ -227,6 +232,19 @@ void mouseDown(int btn, int state, int x, int y)
 		"at " << x << "," << y << endl;
 }
 
+void reshape(int width, int height)
+{
+	//glViewport( GLint x, GLint y, GLsizei width, GLsizei height ); 
+	// Parameters 
+	// x The lower-left corner of the viewport rectangle, in pixels. The default is (0,0).
+	// y The lower-left corner of the viewport rectangle, in pixels. 
+	// Try glViewport(0, 0, width/2, height/2);
+
+	glViewport(0, 0, width, height);
+
+	aspect = GLfloat(width) / height;
+}
+
 //---------------------------------------------------------------------
 //
 // main
@@ -252,5 +270,6 @@ int main(int argc, char** argv)
 	//glutMotionFunc(mouseMove); // Requires click to register.
 	//glutSpecialFunc(keyDownSpec);
 	//glutSpecialUpFunc(keyUpSpec);
+	glutReshapeFunc(reshape);
 	glutMainLoop();
 }

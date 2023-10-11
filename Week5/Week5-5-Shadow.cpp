@@ -1,11 +1,10 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// Shadow.cpp
-//A shadow falls on a flat ground can be described by the equation y = 0. 
-//A shadow polygon is projection of the original polygon onto the surface.
-///////////////////////////////////////////////////////////////////////
-
+/** @file Week5-5-Shadow.cpp
+ *  @brief A shadow falls on a flat ground can be described by the equation y = 0.
+ *
+ *  A shadow polygon is projection of the original polygon onto the surface.
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"

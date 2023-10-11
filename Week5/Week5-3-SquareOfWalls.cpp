@@ -1,12 +1,10 @@
-
-///////////////////////////////////////////////////////////////////////
-//
-// SquareOfWalls.cpp
-//shows four rectangular walls enclosing a square space.
-//The front faces(the outside of the walls) are filled
-//the back faces(the inside) are wireframed
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////////
+/** @file Week5-3-SquareOfWalls.cpp
+ *  @brief shows four rectangular walls enclosing a square space.
+ *
+ *  @note The front faces(the outside of the walls) are filled. The back faces(the inside) can be wireframed by pressing W.
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 
 #include <iostream>
@@ -148,7 +146,10 @@ void display(void)
 	//lastTime = currentTime;
 
 	//glPolygonMode(GL_FRONT, GL_LINE);
-    //glPolygonMode(GL_BACK, GL_LINE);
+    glPolygonMode(GL_BACK, GL_LINE);
+
+	//glPolygonMode(GL_FRONT, GL_POINT);
+	//glPolygonMode(GL_FRONT, GL_FILL);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

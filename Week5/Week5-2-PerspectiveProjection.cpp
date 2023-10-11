@@ -1,9 +1,11 @@
 
-// PerspectiveProjection
-// Perspective view of a color cube using Perspective()
-//
-// Colors are assigned to each face!
-// Hooman Salamat
+/** @file Week5-2-PerspectiveProjection.cpp
+ *  @brief Perspective view of a color cube using Perspective()
+ * 
+ *  @note Colors are assigned to each face!
+ *  @author Hooman Salamat
+ *  @bug No known bugs.
+ */
 
 #include <iostream>
 #include "stdlib.h"
@@ -53,7 +55,7 @@ const GLfloat  dr = 5.0 * 3.14f/180.0f;
 GLfloat  zNear = 0.5, zFar = 3.0;
 
 GLfloat  fovy = 45.0f;  // Field-of-view in Y direction angle (in degrees)
-GLfloat  aspect = 4.0f/3.0f;       // Viewport aspect ratio
+GLfloat  aspect = 4.0f/3.0f;       // Viewport aspect ratio --> reshape function gets called which sets the aspect ratio correctly!
  
 
 static unsigned int
@@ -264,10 +266,15 @@ keyboard(unsigned char key, int x, int y)
 
 //----------------------------------------------------------------------------
 
-void
-reshape(int width, int height)
+void reshape(int width, int height)
 {
-	glViewport(0, 0, width, height);
+	//glViewport( GLint x, GLint y, GLsizei width, GLsizei height ); 
+	// Parameters 
+	// x The lower-left corner of the viewport rectangle, in pixels. The default is (0,0).
+	// y The lower-left corner of the viewport rectangle, in pixels. 
+	// Try glViewport(0, 0, width/2, height/2);
+
+	glViewport(0, 0, width , height );
 
 	aspect = GLfloat(width) / height;
 }
@@ -286,7 +293,7 @@ main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutSetOption(GLUT_MULTISAMPLE, 4);
-	glutInitWindowSize(512, 512);
+	glutInitWindowSize(1024, 512);
 	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow("Color Cube");
