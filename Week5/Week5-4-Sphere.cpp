@@ -33,8 +33,8 @@ float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mvp, view, projection;
 
-const int Ndivisions = 5;
-const int NumTetrahedrons = 1024;            // 4^4 tetrahedrons      
+const int Ndivisions = 6;
+const int NumTetrahedrons = 4096;            // 4^4 tetrahedrons      
 const int NumTriangles = 4 * NumTetrahedrons;  // 4 triangles / tetrahedron
 const int NumVertices = 3 * NumTriangles;      // 3 vertices / triangle
 
@@ -55,6 +55,12 @@ static unsigned int
 program,
 vertexShaderId,
 fragmentShaderId;
+
+GLfloat  aspect = 4.0f / 3.0f;       // Viewport aspect ratio --> reshape function gets called which sets the aspect ratio correctly!
+
+float mWidth = 0.0f;
+float mHeight = 0.0f;
+
 
 
 void triangle(glm::vec3& a, glm::vec3& b, glm::vec3& c)
@@ -94,9 +100,9 @@ void divide_triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, int k)
 		glm::vec3 ab = glm::normalize((a + b) / 2.0f);
 		glm::vec3 ac = glm::normalize((a + c) / 2.0f);
 		glm::vec3 bc = glm::normalize((b + c) / 2.0f);
-		//glm::vec3 ab = (a + b) / 2.0f;
-		//glm::vec3 ac = (a + c) / 2.0f;
-		//glm::vec3 bc = (b + c) / 2.0f;
+		/*glm::vec3 ab = (a + b) / 2.0f;
+		glm::vec3 ac = (a + c) / 2.0f;
+		glm::vec3 bc = (b + c) / 2.0f;*/
 		// subdivide all but inner triangle
 		divide_triangle(a, ab, ac, k - 1);
 		divide_triangle(ab, b, bc, k - 1);
@@ -143,7 +149,7 @@ void init(void)
 	v[3] = glm::vec3(0.816497, -0.471405, 0.333333);
 
 
-	tetra(v[0], v[1], v[2], v[3], Ndivisions);
+	tetra(v[0], v[1], v[2], v[3], 6);
 
 
 	//// compute and store N-1 new points
@@ -248,8 +254,24 @@ void display(void)
 	transformObject(0.5f, X_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//Ordering the GPU to start the pipeline
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 	//glDrawArrays(GL_LINES, 0, NumVertices);
+
+	glViewport(0, 0, mWidth, mHeight);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+
+
+	glViewport(0, 0, mWidth/2, mHeight/2);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	
+	glViewport(0, mHeight / 2, mWidth/2, mHeight/2);
+	glDrawArrays(GL_LINES, 0, NumVertices);
+
+	glViewport(mWidth/2, mHeight / 2, mWidth / 2, mHeight / 2);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+
+	glViewport(mWidth / 2, 0, mWidth / 2, mHeight / 2);
+	glDrawArrays(GL_LINES, 0, NumVertices);
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -311,6 +333,22 @@ void mouseDown(int btn, int state, int x, int y)
 		"at " << x << "," << y << endl;
 }
 
+void reshape(int width, int height)
+{
+	//glViewport( GLint x, GLint y, GLsizei width, GLsizei height ); 
+	// Parameters 
+	// x The lower-left corner of the viewport rectangle, in pixels. The default is (0,0).
+	// y The lower-left corner of the viewport rectangle, in pixels. 
+	// Try glViewport(0, 0, width/2, height/2);
+
+	mWidth = width;
+	mHeight = height;
+
+	glViewport(0, 0, width , height );
+
+	aspect = GLfloat(width) / height;
+}
+
 //---------------------------------------------------------------------
 //
 // main
@@ -333,5 +371,6 @@ int main(int argc, char** argv)
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
 	glutPassiveMotionFunc(mouseMove); // or...
+	glutReshapeFunc(reshape);
 	glutMainLoop();
 }
