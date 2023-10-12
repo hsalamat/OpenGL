@@ -27,6 +27,8 @@ using namespace std;
 
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
+float mWidth, mHeight;
+
 GLfloat cube_vertices[NumVertices][3] = { 0 };
 GLfloat cube_colors[NumVertices][3] = { 0 };
 
@@ -209,7 +211,7 @@ void display(void)
 		radius * cos(theta)
 	);
 
-	//glm::vec3  eye(0.0, 0.0, 3.0);
+	//glm::vec3  eye(0.0, 0.0, -1.0);
 	glm::vec3  at(0.0, 0.0, 0.0);
 	glm::vec3  up(0.0, 1.0, 0.0);
 	view = glm::lookAt(eye, at, up);
@@ -226,7 +228,28 @@ void display(void)
 
 
 	//Ordering the GPU to start the pipeline
+	glViewport(0, 0, mWidth/2, mHeight/2);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Try GL_LINE_STRIP too!
+
+
+	glViewport(0, mHeight / 2, mWidth/2, mHeight / 2);
+	glDrawArrays(GL_LINE_STRIP, 0, NumVertices);
+
+
+	glViewport(mWidth/2, 0, mWidth / 2, mHeight / 2);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices); // Try GL_LINE_STRIP too!
+
+
+	glViewport(mWidth/2, mHeight / 2, mWidth / 2, mHeight / 2);
+	glDrawArrays(GL_LINE_STRIP, 0, NumVertices);
+
+
+	transformObject(0.1f, YZ_AXIS, rotAngle += ((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	glViewport(0, 0, mWidth, mHeight);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+
+
 
 	glBindVertexArray(0); // Can optionally unbind the vertex array to avoid modification.
 
@@ -276,6 +299,9 @@ void reshape(int width, int height)
 
 	glViewport(0, 0, width , height );
 
+	mWidth = width;
+	mHeight = height;
+
 	aspect = GLfloat(width) / height;
 }
 
@@ -293,7 +319,7 @@ main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutSetOption(GLUT_MULTISAMPLE, 4);
-	glutInitWindowSize(1024, 512);
+	glutInitWindowSize(1024, 1024);
 	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow("Color Cube");
