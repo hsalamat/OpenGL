@@ -44,9 +44,9 @@ vertexShaderId,
 fragmentShaderId;
 
 // Globals.
-static float R = 2.0; // Radius of circle.
-static float X = 0.0; // X-coordinate of center of circle.
-static float Y = 0.0; // Y-coordinate of center of circle.
+static float R = 1.0; // Radius of circle.
+static float X = 2.0; // X-coordinate of center of circle.
+static float Y = 2.0; // Y-coordinate of center of circle.
 const int MaxNumVertices = 500; // Number of vertices on circle.
 static int numVertices = 3;
 #define PI 3.14159265358979324
@@ -232,6 +232,26 @@ void keyDown(unsigned char key, int x, int y)
 		break;
 	case '-':
 		numVertices--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'w':
+		Y++;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 's':
+		Y--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'a':
+		X--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'd':
+		X++;
 		createModel(numVertices);
 		glutPostRedisplay();
 		break;
