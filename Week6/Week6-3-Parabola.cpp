@@ -67,15 +67,18 @@ GLint shape_indices[MaxNumVertices] = { 0 };
 // Globals.
 static int isWire = 0; // Is wireframe?
 static int M = 3; // Number of vertices on one half of the parabola.
+static float C = 50.0;
+static float B = 50.0;
+static float A = 100.0;
 
 void createModel()
 {
 	numVertices = 0;
 	for (int i = -M; i <= M; ++i)
 	{
-		vertices[numVertices] = glm::vec3(50.0 + 50.0 * (float)i / M, 100.0 * (float)(i * i) / (M * M), 0.0);
+		vertices[numVertices] = glm::vec3(C + B * (float)i / M, A * (float)(i * i) / (M * M), 0.0);
 		//colors[numVertices] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
-		colors[numVertices] = glm::vec3(0.0f, 1.0f, 0.0f);
+		colors[numVertices] = glm::vec3(0.0f, 191.0f, 255.0f);
 
 		numVertices++;
 	}
@@ -240,6 +243,30 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case 'a':
+		A--;
+		glutPostRedisplay();
+		break;
+	case 'A':
+		A++;
+		glutPostRedisplay();
+		break;
+	case 'b':
+		B--;
+		glutPostRedisplay();
+		break;
+	case 'B':
+		B++;
+		glutPostRedisplay();
+		break;
+	case 'c':
+		C--;
+		glutPostRedisplay();
+		break;
+	case 'C':
+		C++;
+		glutPostRedisplay();
+		break;
 	case '+':
 		M++;
 		glutPostRedisplay();
