@@ -50,6 +50,8 @@ fragmentShaderId;
 static float R = 2.0; // Radius of circle.
 static float X = 0.0; // X-coordinate of center of circle.
 static float Y = 0.0; // Y-coordinate of center of circle.
+static float A = 5;
+static float B = 10;
 const int MaxNumVertices = 500; // Number of vertices on circle.
 static int numVertices = 3;
 #define PI 3.14159265358979324
@@ -93,9 +95,7 @@ void writeBitmapString(void* font, char* string)
 void createModel(int n)
 {
 	float R = 20.0; // Radius of helix.
-	float t; // Angle parameter.
-	float A = 5;
-	float B = 10;
+	float t; // Angle parameter.	
 
 	int i = 0;
 	for (t = 0; t <= 2* PI; t += PI / 20.0)
@@ -259,6 +259,30 @@ void keyDown(unsigned char key, int x, int y)
 	// Orthographic.
 	switch (key)
 	{
+	case 'a':
+		A--;
+		createModel(numVertices);
+		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		glutPostRedisplay();
+		break;
+	case 'A':
+		A++;
+		createModel(numVertices);
+		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		glutPostRedisplay();
+		break;
+	case 'b':
+		B--;
+		createModel(numVertices);
+		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		glutPostRedisplay();
+		break;
+	case 'B':
+		B++;
+		createModel(numVertices);
+		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		glutPostRedisplay();
+		break;
 	case '+':
 		numVertices++;
 		// glutPostRedisplay marks the current window as needing to be redisplayed.
