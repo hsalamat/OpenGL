@@ -258,6 +258,36 @@ void keyDown(unsigned char key, int x, int y)
 		else isWire = 0;
 		glutPostRedisplay();
 		break;
+	case 'w':
+		Y++;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 's':
+		Y--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'a':
+		X--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'd':
+		X++;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'r':
+		R -= 0.2;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case 'R':
+		R += 0.2;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
 	default:
 		break;
 	}
