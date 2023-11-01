@@ -29,11 +29,7 @@ using namespace std;
 #define XZ_AXIS glm::vec3(1,0,1)
 
 GLuint vao, ibo, points_vbo, colors_vbo, modelID, colorID;
-float rotAngle = 0.0f;
 int deltaTime, currentTime, lastTime = 0;
-
-// Horizontal and vertical ortho offsets.
-float osH = 0.0f, osV = 0.0f, scrollSpd = 0.25f;
 
 glm::mat4 mvp, view, projection;
 
@@ -43,9 +39,7 @@ vertexShaderId,
 fragmentShaderId;
 
 // Globals.
-static float R = 2.0; // Radius of circle.
-static float X = 0.0; // X-coordinate of center of circle.
-static float Y = 0.0; // Y-coordinate of center of circle.
+static float N = 10.0; // # of 2pi curves
 const int MaxNumVertices = 500; // Number of vertices on circle.
 static int numVertices = 3;
 #define PI 3.14159265358979324
@@ -75,13 +69,12 @@ void writeBitmapString(void* font, char* string)
 
 
 
-void createModel(int n)
+void createModel()
 {
-	float R = 20.0; // Radius of helix.
 	float t; // Angle parameter.
 
 	int i = 0;
-	for (t = -10* PI; t <= 10 * PI; t += PI / 20.0)
+	for (t = -N* PI; t <= N * PI; t += PI / (2.0 * N))
 	{
 		vertices[i] = glm::vec3(t, sin(t), 0);
 		colors[i] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
@@ -89,7 +82,7 @@ void createModel(int n)
 		i++;
 	}
 
-	for (int i = 0; i < n; ++i) {
+	for (int i = 0; i < numVertices; ++i) {
 
 		shape_vertices[i][0] = vertices[i][0];
 		shape_vertices[i][1] = vertices[i][1];
@@ -195,7 +188,7 @@ void display(void)
 	//projection = glm::ortho(-40.0f, 40.0f, -10.0f, 10.0f, -4.0f, 4.0f);
 	projection = glm::ortho(-40.0f, 40.0f, -5.0f, 5.0f, -6.0f, 4.0f);
 
-	createModel(numVertices);
+	createModel();
 
 	glBindVertexArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
@@ -204,10 +197,20 @@ void display(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape_colors), shape_colors, GL_STATIC_DRAW);
 
 	//transformObject(0.4f, YZ_AXIS, rotAngle+=((float)45 / (float)1000 * deltaTime), glm::vec3(0.0f, 0.0f, 0.0f));
-	transformObject(1.0f, X_AXIS, rotAngle += 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	transformObject(1.0f, X_AXIS, 0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	//Ordering the GPU to start the pipeline
 
-	glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+	if (isWire)
+	{
+		glDrawArrays(GL_LINE_STRIP, 0, numVertices);
+		//glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, NULL);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+		//glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, NULL);
+	}
+
 
 	// Write labels.
 	//glColor3f(1.0, 0.0, 0.0);
@@ -236,13 +239,15 @@ void keyDown(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case '+':
-		numVertices++;
-		// glutPostRedisplay marks the current window as needing to be redisplayed.
+		N++;
+		createModel();
+		//glutPostRedisplay marks the current window as needing to be redisplayed.
 		//glutPostRedisplay();
 		break;
 	case '-':
-		numVertices--;
-		//glutPostRedisplay();
+		N--;
+		createModel();
+		glutPostRedisplay();
 		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
