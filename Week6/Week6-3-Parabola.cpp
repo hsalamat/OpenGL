@@ -1,10 +1,16 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// @file parabola.cpp
+// @file Week6-3-Parabola.cpp
 // @brief create Parabola
 // This program draws a line strip with vertices on a parabola.
-// Increasing the number of vertices makes the strip approximate the parabola.
+// In mathematics, a parabola is a plane curve which is mirror-symmetrical and is approximately U-shaped. 
+// It fits several superficially different mathematical descriptions, 
+// which can all be proved to define exactly the same curves.
+// The graph of a quadratic function  y = ax^2 + bx + c  is a parabola if a!=0 
+// and, conversively, a parabola is the graph of a quadratic function if its axis is parallel to the y-axis.
+// 
+// @attention Increasing the number of vertices makes the strip approximate the parabola.
 //
 // Interaction:
 // @note: Press +/- to increase/decrease the number of vertices of the strip.

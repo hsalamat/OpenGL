@@ -1,7 +1,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// @file DynamicPolygonUsingIndices.cpp
+// @file Week6-2-DynamicPolygonUsingIndices.cpp
 // @brief create Dynamic Polygons Using Indices
 // @attention let's create a model in the init() so we don't change the color randomly
 //

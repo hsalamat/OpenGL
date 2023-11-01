@@ -1,23 +1,28 @@
 
 ///////////////////////////////////////////////////////         
-// helix.cpp
+// @file Week6-5-Helix.cpp
 //
-// This program approximates a helix with a line strip.
-//Helix is an object having a three-dimensional shape like that of a wire wound uniformly in a single layer around a cylinder or cone, as in a corkscrew or spiral staircase.
-//The helix climbs up the z axis simultaneously as it rotates circularly with increasing t (it coils around the z-axis)
+// @brief This program approximates a helix with a line strip.
+// 
+// Helix is an object having a three-dimensional shape like that of a wire 
+// wound uniformly in a single layer around a cylinder or cone, as in a corkscrew or spiral staircase.
+// The helix climbs up the z axis simultaneously as it rotates circularly with increasing t (it coils around the z-axis)
 //
-//Parametric Equation:
+// Parametric Equation:
 // x = R * cos(t), y = R * sin(t) and z = t - 60.0  -10PI <= t <= 10PI
-//you can simply have  z = t, however we tack on z = t - 60 to push the helix far enough down the z axis
-//one full turn is around 2PI --> we wanted to have 10 rounds!
-//When you run, you only see a circle, becuase of orthographic project onto the vewing face flattens the helix
-//To fix this, we need to turn the helix upright, so it coils around the y-axis.
-//x = R * cos(t), z = R * sin(t) and y = t - 60.0 
-//orthographics projection squashes a dimension so it's not suitable for 3D scene.
-//for perspective dimension we use glFrustum(left, right, bottom, top, near, far)
-//frustum is a truncated pyramid whose top has been cut off by a plane parallel to its  base
-//Update the ortho projection!!!
-// Hooman Salamat
+// you can simply have  z = t, however we tack on z = t - 60 to push the helix far enough down the z axis
+// one full turn is around 2PI --> we wanted to have 10 rounds!
+// 
+// @attention When you run, you only see a circle, becuase of orthographic project onto the vewing face flattens the helix
+// To fix this, we need to turn the helix upright, so it coils around the y-axis.
+// x = R * cos(t), z = R * sin(t) and y = t - 60.0 
+// 
+// @note orthographics projection squashes a dimension so it's not suitable for 3D scene.
+// for perspective dimension we use glFrustum(left, right, bottom, top, near, far)
+// frustum is a truncated pyramid whose top has been cut off by a plane parallel to its  base
+// Change the ortho projection to perspective!
+// 
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////////
 
 

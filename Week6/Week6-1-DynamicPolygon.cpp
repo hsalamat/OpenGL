@@ -1,19 +1,14 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// DynamicPolygon.cpp
+// @file Week6-1-DynamicPolygon.cpp
+// @brief This program draws a line loop/TRIANLGE FAN with vertices equally apart on a fixed circle. 
+// The larger the number of vertices the better the loop approximates the circle.
 //
-// This program draws a line loop/TRIANLGE FAN with vertices equally apart on 
-// a fixed circle. The larger the number of vertices the better
-// the loop approximates the circle.
-//
-// Interaction: 
-// Press the space bar to toggle between wirefrime and polygon.
-// Press +/- to increase/decrease the number of vertices of the loop. 
-// Hooman Salamat
+// @note Press the space bar to toggle between wirefrime and polygon.
+// @note Press +/- to increase/decrease the number of vertices of the loop. 
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
-
-
 
 #include <iostream>
 #include "stdlib.h"

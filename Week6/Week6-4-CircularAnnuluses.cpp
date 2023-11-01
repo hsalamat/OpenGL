@@ -1,22 +1,24 @@
 
 ///////////////////////////////////////////////////////////////////////       
-// CircularAnnuluses.cpp
+// @file Week6-4-CircularAnnuluses.cpp
 //
-// This program draws three identical-looking circular annuluses in three different ways - 
-// see comments below.
+// @brief This program draws three identical-looking circular annuluses in three different ways.
+// 
+// In mathematics, an annulus is the region between two concentric circles. 
+// Informally, it is shaped like a ring or a hardware washer. 
 //
-//Upper-left: There is not a real hole. The white disc overwrites the red disc
-//
-//Upper-right: There is not a real hole either. A white disc is drawn closer to the
-//viewer than the blue disc blocking it out :
-//Observe that the z - value of the white disc's center is greater than the red disc's,
-//bringing it closer to the viewing face.
+// Upper-left annulus: There is not a real hole. The white disc overwrites the red disc
+// Upper-right annulus: There is not a real hole either. A white disc is drawn closer to the
+// viewer than the blue disc blocking it out.
+// Lower annulus: A true circular annulus with a real hole
+// 
+// @attention Observe that the z - value of the white disc's center is greater than the red disc's,
+// bringing it closer to the viewing face.
 //
 // Interaction: 
-// Press the space bar to toggle between wirefrime and filled for the lower annulus.
-// Hooman Salamat
+// @note Press the space bar to toggle between wirefrime and filled for the lower annulus.
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
-///////////////////////////////////////////////////////////////////////
 
 
 #include <iostream>
@@ -275,21 +277,20 @@ void display(void)
 	drawDisc(20.0, 25.0, 75.0, 0.0, 1);
 	drawDisc(10.0, 25.0, 75.0, 0.0, 7);
 	
-	////Upper-right: There is not a real hole either. A white disc is drawn closer to the
-	////viewer than the blue disc blocking it out :
-	////
+	//Upper-right: There is not a real hole either. A white disc is drawn closer to the
+	//viewer than the blue disc blocking it out :
 	glEnable(GL_DEPTH_TEST);
 	drawDisc(20.0, 75.0, 75.0, 0.0, 2);
 	drawDisc(10.0, 75.0, 75.0, 0.5, 7);
 	glDisable(GL_DEPTH_TEST);
 
-	//////
-	////////Lower: A true circular annulus with a real hole :
+	
+	//Lower: A true circular annulus with a real hole :
 	drawAnnulus(10.0, 50.0, 25.0, 0.0, 6);
 
 
-	//////// Write labels.
-	//////glColor3f(0.0, 0.0, 0.0);
+	//Write labels.
+	//glColor3f(0.0, 0.0, 0.0);
 	
 	glRasterPos3f(15.0, 51.0, 0.0);
 	writeBitmapString((void*)font, (char*)"Overwritten");

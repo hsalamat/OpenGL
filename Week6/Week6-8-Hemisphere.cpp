@@ -1,15 +1,12 @@
+///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// Ellipse.cpp
-//
-//Draw an ellipse.
-//Recall the parametric equations for an ellipse on the xy - plane, centered at(X; Y), 
-//with semi - major axis of length A and semi - minor axis of length B :
-//	x = X + Acos t; y = Y + B sin t; z = 0; 0 <= t <= 2pi
+// @file Week6-8-Hemisphere.cpp
+// @brief Draw a hemisphere. 
 // 
 // Interaction: 
-// Press the space bar to toggle between wirefrime and polygon.
-// Press +/- to increase/decrease the number of vertices of the loop.
-// Hooman Salamat
+// @note Press the space bar to toggle between wirefrime and polygon.
+// 
+// @author Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
 
 
