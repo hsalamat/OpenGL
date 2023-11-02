@@ -71,6 +71,10 @@ static float C = 50.0;
 static float B = 50.0;
 static float A = 100.0;
 
+static float r = 0.0f;
+static float g = 191.0f;
+static float b = 255.0f;
+
 void createModel()
 {
 	numVertices = 0;
@@ -78,7 +82,7 @@ void createModel()
 	{
 		vertices[numVertices] = glm::vec3(C + B * (float)i / M, A * (float)(i * i) / (M * M), 0.0);
 		//colors[numVertices] = glm::vec3((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX);
-		colors[numVertices] = glm::vec3(0.0f, 191.0f, 255.0f);
+		colors[numVertices] = glm::vec3(r/255.0f, g/255.0f, b/255.0f);
 
 		numVertices++;
 	}
@@ -195,7 +199,7 @@ void display(void)
 	projection = glm::ortho(0.0, 100.0, 0.0, 100.0, -4.0, 4.0);
 
 	//Comment this out if you are not interested in changing colors randomly
-	createModel();
+	//createModel();
 
 	glBindVertexArray(1);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -245,39 +249,88 @@ void keyDown(unsigned char key, int x, int y)
 	{
 	case 'a':
 		A--;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case 'A':
 		A++;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case 'b':
 		B--;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case 'B':
 		B++;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case 'c':
 		C--;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case 'C':
 		C++;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case '+':
 		M++;
+		createModel();
 		glutPostRedisplay();
 		break;
-	case '-':
+	case '-':		
 		if (M > 2) M--;
+		createModel();
 		glutPostRedisplay();
 		break;
 	case ' ':
 		if (isWire == 0) isWire = 1;
 		else isWire = 0;
+		glutPostRedisplay();
+		break;
+	default:
+		break;
+	}
+}
+
+void specialKey(int key, int x, int y)
+{
+	// Orthographic.
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		r++;
+		//cout << " r: " << r << endl;
+		createModel();
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_DOWN:
+		r--;
+		createModel();
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_LEFT:
+		g--;
+		createModel();
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_RIGHT:
+		g++;
+		createModel();
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_PAGE_UP:
+		b--;
+		createModel();
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		b++;
+		createModel();
 		glutPostRedisplay();
 		break;
 	default:
@@ -322,6 +375,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
+	glutSpecialFunc(specialKey);
 	glutPassiveMotionFunc(mouseMove); // or...
 	//glutMotionFunc(mouseMove); // Requires click to register.
 	glutMainLoop();
