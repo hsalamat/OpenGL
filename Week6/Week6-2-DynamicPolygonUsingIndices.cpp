@@ -293,6 +293,37 @@ void keyDown(unsigned char key, int x, int y)
 	}
 }
 
+
+void specialKey(int key, int x, int y)
+{
+	// Orthographic.
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		Y++;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_DOWN:
+		Y--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_LEFT:
+		X--;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_RIGHT:
+		X++;
+		createModel(numVertices);
+		glutPostRedisplay();
+		break;	
+	default:
+		break;
+	}
+}
+
 void keyUp(unsigned char key, int x, int y)
 {
 	// Empty for now.
@@ -328,6 +359,7 @@ int main(int argc, char** argv)
 	glutIdleFunc(idle);
 	glutTimerFunc(33, timer, 0);
 	glutKeyboardFunc(keyDown);
+	glutSpecialFunc(specialKey);
 	glutKeyboardUpFunc(keyUp);
 	glutMouseFunc(mouseDown);
 	glutPassiveMotionFunc(mouseMove); // or...
