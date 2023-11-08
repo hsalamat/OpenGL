@@ -1,8 +1,12 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// TextureObjectDemo1.cpp
-// Use the texture class that we have created
+// @file Week9-2-TextureObjectDemo.cpp
+// @brief Using the texture class that we have created
+// @attention our uv here is actually a st coordinate
+// @note uv coordinates start from the upper left corner (v-axis is facing down).
+// @note st coordinates start from the lower left corner (t-axis is facing up).
+// 
 // @author: Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
 
@@ -233,7 +237,7 @@ void init(void)
 
 	glUniform1i(gSampler, 0);
 	//loadTexture("Media/spheremap.png");
-	pTexture = new Texture(GL_TEXTURE_2D, "Media/spheremap.png", GL_RGB);
+	pTexture = new Texture(GL_TEXTURE_2D, "Media/launch.bmp", GL_RGB);
 	pTexture->Bind(GL_TEXTURE0);
 	if (!pTexture->Load()) {
 		exit(0);

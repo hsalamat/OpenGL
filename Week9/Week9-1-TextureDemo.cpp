@@ -1,9 +1,9 @@
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////         
-// @file: TextureDemo1.cpp
-// We are using stb_image to load image data so we can create OpenGL textures. 
-//https://github.com/nothings/stb
+// @file: Week9-1-TextureDemo.cpp
+// @brief We are using stb_image to load image data so we can create OpenGL textures. 
+// @attention https://github.com/nothings/stb
 // UV origin for OpenGL is bottom-left
 // @author: Hooman Salamat
 ///////////////////////////////////////////////////////////////////// 
@@ -373,7 +373,10 @@ void mouseClick(int btn, int state, int x, int y)
 		lastX = x;
 		lastY = y;
 		mouseClicked = true;
+		//glutSetCursor changes the cursor image of the current window.
 		glutSetCursor(GLUT_CURSOR_NONE);
+		//GLUT_CURSOR_DESTROY: Skull& cross bones.
+		glutSetCursor(GLUT_CURSOR_DESTROY);
 		cout << "Mouse clicked." << endl;
 	}
 	else

@@ -1,15 +1,13 @@
-
 ///////////////////////////////////////////////////////////////////////
-// fieldAndSky.cpp
-//
-// This program shows a grass-textured field and a textured sky. The viewpoint can be moved.
-//
+/////////////////////////////////////////////////////////////////////         
+// @file Week9-4-FieldAndSkyDemo.cpp
+// @brief This program shows a grass-textured field and a textured sky. The viewpoint can be moved.
+// 
 // Interaction:
 // Press the up and down arrow keys to move the viewpoint over the field.
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////// 
-
-
+// @author: Hooman Salamat
+/////////////////////////////////////////////////////////////////////
+ 
 #include <iostream>
 #include "stdlib.h"
 #include "time.h"

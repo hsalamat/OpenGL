@@ -1,16 +1,14 @@
-////////////////////////////////////////////////////////////////////////////////////////
-// fieldAndSkyFiltered.cpp
-//
-// This program is based on fieldAndSky.cpp. In addition to the viewpoint being movable, 
+///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////         
+// @file Week9-4-Week9-5-FieldAndSkyFilteredDemo.cpp
+// @brief This program is based on fieldAndSky.cpp. In addition to the viewpoint being movable, 
 // the grass texture filter can be set at different levels.
-//
+// 
 // Interaction:
 // Press the up and down arrow keys to move the viewpoint over the field.
 // Press the left and right arrow keys to cycle through the filters.
-//
-// Hooman Salamat
-///////////////////////////////////////////////////////////////////// 
-
+// @author: Hooman Salamat
+/////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 #include "stdlib.h"

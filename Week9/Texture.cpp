@@ -35,6 +35,8 @@ bool Texture::Load()
     /// That's why we have texture units sitting between texture objects and shaders.
     /// Then shaders samples from the texture unit. 
     /// So between draw calls, we can point to a different texture unit.
+    /// The above would return a value such as 16 or 32 or above. That is the number of image samplers that your GPU supports in the fragment shader.
+    /// 
     int textureUnits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
     cout << "The number of my GPU texture units: " << textureUnits;
