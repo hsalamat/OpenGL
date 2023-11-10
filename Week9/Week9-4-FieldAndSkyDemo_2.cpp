@@ -18,11 +18,11 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtc\type_ptr.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-//step1
 //#include "stb_image.h"
 #include "Texture.h"
 #include <array>
 using namespace std;
+Texture* pTexture = NULL;
 
 #define X_AXIS glm::vec3(1,0,0)
 #define Y_AXIS glm::vec3(0,1,0)
@@ -59,10 +59,6 @@ int lastX, lastY;
 // Texture variables.
 GLuint textureID;
 GLint width, height, bitDepth;
-
-//step2
-Texture* pTexture = NULL;
-GLuint gSampler;
 
 static float d = 0.0; // Distance parameter in gluLookAt().
 
@@ -114,7 +110,6 @@ void resetView()
 	yaw = -90.0f;
 }
 
-//step3
 //void loadGrassTexture()
 //{
 //	stbi_set_flip_vertically_on_load(true);
@@ -304,17 +299,14 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(1);
-
 	//loadGrassTexture();
 	pTexture = new Texture(GL_TEXTURE_2D, "Media/grass.bmp", GL_RGB);
 	pTexture->Bind(GL_TEXTURE0);
 	if (!pTexture->Load()) {
 		exit(0);
 	}
-
-
-
-
+	 
+	
 	// Update the projection or view if perspective.
 	projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 
@@ -328,15 +320,13 @@ void display(void)
 
 
 	glBindVertexArray(2);
-
+	//loadSkyTexture();
 	pTexture = new Texture(GL_TEXTURE_2D, "Media/sky.bmp", GL_RGB);
 	pTexture->Bind(GL_TEXTURE0);
 	if (!pTexture->Load()) {
 		exit(0);
 	}
 
-
-	//loadSkyTexture();
 	// Update the projection or view if perspective.
 	projection = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 
