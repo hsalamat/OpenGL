@@ -1,4 +1,3 @@
-﻿
 /** @file Week13-3-SpotLightDemo.cpp
  *  @brief Using Shape.h + Light.h + Texture.h
  *  @note press WASD for tracking the camera or zooming in and out
@@ -22,11 +21,16 @@ using namespace std;
 #include "Shape.h"
 #include "Light.h"
 #include "Texture.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 #define BUFFER_OFFSET(x)  ((const void*) (x))
 #define FPS 60
 #define MOVESPEED 0.1f
 #define TURNSPEED 0.05f
+
+//Rotation Parameters
 #define X_AXIS glm::vec3(1,0,0)
 #define Y_AXIS glm::vec3(0,1,0)
 #define Z_AXIS glm::vec3(0,0,1)
@@ -35,17 +39,16 @@ using namespace std;
 #define XZ_AXIS glm::vec3(1,0,1)
 #define SPEED 0.25f
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
+//Ensure that we can handle more than one key press in our app
+//Our mask is an 8 bit - every bit is in charge of a key press
 enum keyMasks {
 	KEY_FORWARD = 0b00000001,		// 0x01 or   1	or   01
 	KEY_BACKWARD = 0b00000010,		// 0x02 or   2	or   02
 	KEY_LEFT = 0b00000100,
 	KEY_RIGHT = 0b00001000,
-	KEY_UP = 0b00010000,
-	KEY_DOWN = 0b00100000,
-	KEY_MOUSECLICKED = 0b01000000
+	KEY_UP = 0b00010000,   //2^4 = 16
+	KEY_DOWN = 0b00100000,  //2^5 = 32
+	KEY_MOUSECLICKED = 0b01000000  //2^6 = 64
 
 	// Any other keys you want to add.
 };
@@ -65,39 +68,48 @@ unsigned char keys = 0; // Initialized to 0 or 0b00000000.
 GLuint blankID;
 GLint width, height, bitDepth;
 
-//Directional Light Position (this is the sphere's position!)
+
+//lightposition (this is the sphere's position!)
 glm::vec3 directionalLightPosition = glm::vec3(8.0f, 10.0f, 0.0f);
+
 glm::vec3 pointLightPosition = glm::vec3(5.0f, 1.0f, -2.5f);
+
 glm::vec3 spotLightPosition = glm::vec3(5.0f, 1.75f, -5.0f);
+
 
 
 
 // Light objects. Now OOP.
 AmbientLight aLight(
-	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
-	0.1f);							// Diffuse strength.
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Ambient color.
+	0.1f);							// Ambient strength.
 
 DirectionalLight dLight(
-	//glm::vec3(1.0f, 0.0f, 0.0f),	// Origin.
-	directionalLightPosition,
+	glm::vec3(0.0f, 1.0f, 1.0f),	// direction.using the origin
+	//directionalLightPosition,
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
-	0.5f);							// Diffuse strength.
+	0.4f);		
+
 
 PointLight pLight(
 	glm::vec3(5.0f, 1.0f, -2.5f),	// Position.
 	//pointLightPosition,
-	50.0f,							// Range.
-	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
-	glm::vec3(0.0f, 0.0f, 1.0f),	// Diffuse color.
-	1.0f);							// Diffuse strength.
+	45.0f,							// Range.
+	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   1/(ax^2 + bx + c)
+	glm::vec3(1.0f, 1.0f, 0.0f),	// Diffuse color.
+	1.0f);
+
 
 SpotLight sLight(
 	spotLightPosition,	// Position.
-	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse color.
+	glm::vec3(1.0f, 1.0f, 0.0f),	// Diffuse color.
 	1.0f,							// Diffuse strength.
 	glm::vec3(0.0f, -1.0f, 0.0f),  // Direction.
 	150.0f  //edge
 );
+
+
+// Diffuse strength.
 
 Material mat = { 0.5f, 8 }; // Alternate way to construct an object.
 
@@ -108,47 +120,70 @@ GLfloat pitch, yaw;
 int lastX, lastY;
 
 // Geometry data.
-Grid g_grid(16);
-Cube g_cube;
+Grid g_grid(16); //16x16
+//Cube g_cube;
+Cube2 g_cube(2.0f, 2.0f, 2.0f);
 Prism g_prism(7);
-Sphere g_sphere(6);
+Sphere g_sphere(5);
 Cone g_cone(7);
 
 void timer(int); // Prototype.
+
 Texture* pTexture = NULL;
-Texture* gridTexture = NULL;
+Texture* blankTexture = NULL;
+Texture* myTexture = NULL;
 GLuint textureID;
+
+
 
 void resetView()
 {
-	position = glm::vec3(8.0f, 5.0f, 20.0f); // Super pulled back because of grid size.
+	position = glm::vec3(8.0f, 5.0f, 20.0f);
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
 	yaw = -90.0f;
-	// View will now get set only in transformObject
 }
 
-void loadTexture()
-{
-	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-	pTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
-	pTexture->Bind(GL_TEXTURE0);
-	if (!pTexture->Load()) {
-		exit(0);
-	}
 
-	gridTexture = new Texture(GL_TEXTURE_2D, "Media/dirt.png", GL_RGB);
-	gridTexture->Bind(GL_TEXTURE0);
-	if (!gridTexture->Load()) {
-		exit(0);
-	}
+void loadTextures()
+{
+	//// Image loading.
+	//stbi_set_flip_vertically_on_load(true);
+
+	//// Load first image.
+	//unsigned char* image = stbi_load("Media/blank.jpg", &width, &height, &bitDepth, 0);
+	//if (!image) { cout << "Unable to load file!" << endl; }
+	//glGenTextures(1, &blankID);
+	//glBindTexture(GL_TEXTURE_2D, blankID);
+	//// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	//stbi_image_free(image);
+	//// End first image.
+
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+	pTexture = new Texture(GL_TEXTURE_2D, "Media/sugary.bmp", GL_RGB);
+	pTexture->Bind(GL_TEXTURE0);
+	pTexture->Load();
+
+	blankTexture = new Texture(GL_TEXTURE_2D, "Media/blank.jpg", GL_RGB);
+	blankTexture->Bind(GL_TEXTURE0);
+	blankTexture->Load();
+
+	myTexture = new Texture(GL_TEXTURE_2D, "Media/stickman.jpg", GL_RGB);
+	myTexture->Bind(GL_TEXTURE0);
+	myTexture->Load();
 
 }
 
 void setupLights()
 {
-
 	// Setting material values.
 	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), mat.specularStrength);
 	glUniform1f(glGetUniformLocation(program, "mat.shininess"), mat.shininess);
@@ -166,6 +201,7 @@ void setupLights()
 	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColor"), pLight.diffuseColor.x, pLight.diffuseColor.y, pLight.diffuseColor.z);
 	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
 
+
 	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
 	glUniform1f(glGetUniformLocation(program, "pLight.constant"), pLight.constant);
 	glUniform1f(glGetUniformLocation(program, "pLight.linear"), pLight.linear);
@@ -182,7 +218,6 @@ void setupLights()
 
 
 
-
 }
 
 void setupVAOs()
@@ -194,7 +229,6 @@ void setupVAOs()
 	g_sphere.BufferShape();
 	g_cone.BufferShape();
 }
-
 
 void setupShaders()
 {
@@ -248,12 +282,11 @@ void init(void)
 	// Camera matrix
 	resetView();
 
-	loadTexture();
+	loadTextures();
 
 	setupLights();
 
 	setupVAOs();
-
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -263,6 +296,8 @@ void init(void)
 
 	timer(0); // Setup my recursive 'fixed' timestep/framerate.
 }
+
+
 
 //---------------------------------------------------------------------
 //
@@ -312,38 +347,50 @@ void display(void)
 	setupLights();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	gridTexture->Bind(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, blankID); // Use this texture for all shapes.
 
-	// Grid. Note: I rendered it solid!
+
+	// Grid. 
+	blankTexture->Bind(GL_TEXTURE0);
+	g_grid.RecolorShape(1.0, 0.0, 1.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	g_grid.DrawShape(GL_TRIANGLES);
+	g_grid.DrawShape(GL_LINE_LOOP);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	pTexture->Bind(GL_TEXTURE0);
-	// Cube.
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
+	//// Cube.
+	myTexture->Bind(GL_TEXTURE0);
+	g_cube.RecolorShape(0.0, 1.0, 1.0);
+	transformObject(glm::vec3(2.0f, 2.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(8.0f, 2.0f, -1.0f));
 	g_cube.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	angle += 2.0f;
 
-	// Sphere (directional light)
-	g_sphere.RecolorShape(1.0, 1.0, 0.0);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, directionalLightPosition);
+	//// Sphere.
+	blankTexture->Bind(GL_TEXTURE0);
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, angle, pLight.position);
+	g_sphere.RecolorShape(1.0, 1.0, 1.0);
 	g_sphere.DrawShape(GL_TRIANGLES);
-
-	// Sphere (point light).
-	g_sphere.RecolorShape(0.0, 0.0, 1.0);
-	transformObject(glm::vec3(0.2f, 0.2f, 0.2f), X_AXIS, angle, pointLightPosition);
-	g_sphere.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Cone (spot light).
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, spotLightPosition);
+	blankTexture->Bind(GL_TEXTURE0);
+	g_cone.RecolorShape(1.0, 1.0, 1.0);
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, sLight.position);
 	g_cone.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Prism.
+	//// Prism.
+	blankTexture->Bind(GL_TEXTURE0);
+	g_prism.RecolorShape(0.0, 1.0, 0.0);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 2.0f, -1.0f));
 	glUniform1f(glGetUniformLocation(program, "mat.specularStrength"), 1.0f);
 	glUniform1f(glGetUniformLocation(program, "mat.shininess"), 128);
 	g_prism.DrawShape(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -382,6 +429,38 @@ void timer(int) { // Tick of the frame.
 	// Calling next tick
 	int end = glutGet(GLUT_ELAPSED_TIME);
 	glutTimerFunc((1000 / FPS) - (end - start), timer, 0);
+}
+
+
+//alphanumeric keys
+void keyUp(unsigned char key, int x, int y) // x and y is mouse location upon key press.
+{
+	switch (key)
+	{
+	case 'w':
+		keys &= ~KEY_FORWARD; // keys = keys & ~KEY_FORWARD. ~ is bitwise NOT.
+		break;
+	case 's':
+		keys &= ~KEY_BACKWARD;
+		break;
+	case 'a':
+		keys &= ~KEY_LEFT;
+		break;
+	case 'd':
+		keys &= ~KEY_RIGHT;
+		break;
+	case 'r':
+		keys &= ~KEY_UP;
+		break;
+	case 'f':
+		keys &= ~KEY_DOWN;
+		break;
+	case ' ':
+		resetView();
+		break;
+	default:
+		break;
+	}
 }
 
 // Keyboard input processing routine.
@@ -426,64 +505,35 @@ void keyDownSpec(int key, int x, int y) // x and y is mouse location upon key pr
 	switch (key)
 	{
 	case GLUT_KEY_UP: // Up arrow.
-		spotLightPosition.y += 1 * MOVESPEED;
-		sLight.position = spotLightPosition;
+		sLight.position.y += 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_DOWN: // Down arrow.
-		spotLightPosition.y -= 1 * MOVESPEED;
-		sLight.position = spotLightPosition;
+		sLight.position.y -= 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_LEFT: // Left arrow.
-		spotLightPosition.x -= 1 * MOVESPEED;
-		sLight.position = spotLightPosition;
+		sLight.position.x -= 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_RIGHT: // DoRightwn arrow.
-		spotLightPosition.x += 1 * MOVESPEED;
-		sLight.position = spotLightPosition;;
+		sLight.position.x += 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_UP: // PAGE UP.
-		spotLightPosition.z -= 1 * MOVESPEED;
-		sLight.position = spotLightPosition;
+		sLight.position.z -= 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	case GLUT_KEY_PAGE_DOWN: // PAGE DOWN.
-		spotLightPosition.z += 1 * MOVESPEED;
-		sLight.position = spotLightPosition;
+		sLight.position.z += 1 * MOVESPEED;
+		//dLight.direction = directionalLightPosition;
 		break;
 	default:
 		break;
 	}
 }
 
-void keyUp(unsigned char key, int x, int y) // x and y is mouse location upon key press.
-{
-	switch (key)
-	{
-	case 'w':
-		keys &= ~KEY_FORWARD; // keys = keys & ~KEY_FORWARD. ~ is bitwise NOT.
-		break;
-	case 's':
-		keys &= ~KEY_BACKWARD;
-		break;
-	case 'a':
-		keys &= ~KEY_LEFT;
-		break;
-	case 'd':
-		keys &= ~KEY_RIGHT;
-		break;
-	case 'r':
-		keys &= ~KEY_UP;
-		break;
-	case 'f':
-		keys &= ~KEY_DOWN;
-		break;
-	case ' ':
-		resetView();
-		break;
-	default:
-		break;
-	}
-}
-
+//arrows
 void keyUpSpec(int key, int x, int y) // x and y is mouse location upon key press.
 {
 	switch (key)
@@ -528,10 +578,7 @@ void mouseClick(int btn, int state, int x, int y)
 	}
 }
 
-//---------------------------------------------------------------------
-//
-// clean
-//
+
 void clean()
 {
 	cout << "Cleaning up!" << endl;
